@@ -1,20 +1,17 @@
 ﻿namespace BMSParser_new
 {
-    class StopEvent
+    class StopEvent : BmsEvent
     {
-        public ulong y; //pulse num
         public ulong duration; // stop duration (pulse)
 
+        public ulong id; // id for searching StopHeader
 
-        //temporary field
-        public int measureNum;
-        public double measureDiv;
-
-        public StopEvent(ulong duration, int measureNum, double measureDiv)
+        public StopEvent(ulong id, int measure, double measureDiv)
         {
-            this.duration = duration;
-            this.measureNum = measureNum;
+            this.id = id;
+            this.measure = measure;
             this.measureDiv = measureDiv;
+            eventType = EventType.StopEvent;
         }
     }
 }

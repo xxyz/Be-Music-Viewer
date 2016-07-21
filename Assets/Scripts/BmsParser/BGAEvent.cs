@@ -1,19 +1,15 @@
 ﻿namespace BMSParser_new
 {
-    class BGAEvent
+    class BGAEvent : BmsEvent
     {
-        public ulong y;
         public ulong id;
-
-        //temporary field
-        public int measureNum;
-        public double measureDiv;
-
-        public BGAEvent(int id, int measureNum, double measureDiv)
+        
+        public BGAEvent(int id, int measure, double measureDiv, EventType eventType)
         {
             this.id = (ulong)id;
-            this.measureNum = measureNum;
+            this.measure = measure;
             this.measureDiv = measureDiv;
+            this.eventType = eventType;
         }
     }
 }

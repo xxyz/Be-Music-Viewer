@@ -5,12 +5,19 @@ using UnityEngine.UI;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using System.Drawing;
 
 public class GameController : MonoBehaviour {
 
     public string BmsPath = "D:/BMS/BMS/[しらいし]Moon-gate/_Moon-gate_1n.bms";
     public GameObject soundchannelpre;
+    public GameObject noteScratch;
+    public GameObject noteWhite;
+    public GameObject noteBlue;
+    public GameObject linePre;
+    public GameObject slider;
     public ulong pulseOffset;
+    public int highSpeed = 100;
 
     private BMS bms;
 
@@ -24,18 +31,27 @@ public class GameController : MonoBehaviour {
     private int layerIndex = 0;
     Sprite[] layerSprites;
 
-    private int bpmIndex = 0;
+    
 
+    private GameObject[] soundObjects;
+
+    private int bpmIndex = 0;
+    private int eventCounter = 0;
     private ulong pulse100000 = 0;
     private ulong pulse = 0;
+    private double bmsTime = 0;
+    private int measure = 0;
+    private ulong lastPulse;
 
+    private float highSpeedConstant = 0.001f;
     private double pulseConstant;
     private int eventLength;
     private float worldScreenHeight;
     private float worldScreenWidth;
     private NotePlayer[] notePlayers;
 
-    private Text titleText, artistText, bpmText, bgaText, layerText, pulseText, genreText;
+    private Text titleText, subtitleText, artistText, bpmText, bgaText, 
+        layerText, pulseText, genreText, timeText, measureText, totalText, resolutionText;
     
 
     void Start ()
@@ -50,106 +66,249 @@ public class GameController : MonoBehaviour {
 
         //get components
         bga = GameObject.Find("BGA Back");
-        Debug.Log(bga);
         bgImage = bga.GetComponent<SpriteRenderer>();
-        Debug.Log(bgImage);
         bgaLayer = GameObject.Find("BGA Layer");
         layerImage = bgaLayer.GetComponent<SpriteRenderer>();
+        
 
         //set variables
-        
-        bgaSprites = new Sprite[bms.bga.bga_header[bms.bga.bga_header.Count - 1].id + 100];
-        layerSprites = new Sprite[bms.bga.bga_header[bms.bga.bga_header.Count - 1].id + 100];
-        eventLength = bms.bga.bga_events.Count;
+        ulong maxSoundObjectId = 0;
+        ulong maxBgaHeaderId = 0;
+
+        foreach (BmsEvent be in bms.bmsEvents)
+        {
+            if (be.eventType == BMSParser_new.EventType.NoteEvent && ((NoteEvent)be).id > maxSoundObjectId)
+                maxSoundObjectId = ((NoteEvent)be).id;
+        }
+        foreach (BGAHeader bh in bms.bga.bga_header)
+        {
+            if (bh.id > maxBgaHeaderId)
+            {
+                maxBgaHeaderId = bh.id;
+            }
+        }
+
+        bgaSprites = new Sprite[maxBgaHeaderId+10];
+        layerSprites = new Sprite[maxBgaHeaderId+10];
+        eventLength = bms.bmsEvents.Count;
         
         pulseConstant = bms.info.init_bpm * bms.info.resolution / (60 * 4);
+        lastPulse = bms.bmsEvents[bms.bmsEvents.Count - 1].y;
 
         titleText = GameObject.Find("TitleText").GetComponent<Text>();
+        subtitleText = GameObject.Find("SubtitleText").GetComponent<Text>();
         artistText = GameObject.Find("ArtistText").GetComponent<Text>();
         bpmText = GameObject.Find("BpmText").GetComponent<Text>();
         bgaText = GameObject.Find("BgaText").GetComponent<Text>();
         layerText = GameObject.Find("LayerText").GetComponent<Text>();
         pulseText = GameObject.Find("PulseText").GetComponent<Text>();
         genreText = GameObject.Find("GenreText").GetComponent<Text>();
+        timeText = GameObject.Find("TimeText").GetComponent<Text>();
+        measureText = GameObject.Find("MeasureText").GetComponent<Text>();
+        totalText = GameObject.Find("TotalText").GetComponent<Text>();
+        resolutionText = GameObject.Find("ResolutionText").GetComponent<Text>();
+
+
+        soundObjects = new GameObject[maxSoundObjectId+10];
 
         //set Text
         titleText.text = "Title: " + bms.info.title;
+        subtitleText.text = "Subtitle: " + bms.info.subtitle;
         artistText.text = "Artist: " + bms.info.artist;
         bpmText.text = "Bpm: " + bms.info.init_bpm;
         genreText.text = "Genre: " + bms.info.genre;
+        totalText.text = "Total: " + bms.info.total;
+        measureText.text = "Measure: 0/" + bms.info.maxMeasure;
+        resolutionText.text = "Resolution: " + bms.info.resolution;
+        
 
         LoadBga();
 
-        LoadSound(bms.sound_channels);
+        LoadSound(bms.info.soundHeaders);
+        NotePlacement();
+        
     }
 	
 	// Update is called once per frame
 	void Update () {
 
-        //bpm change events;
-        if(bms.bpm_events.Count != 0 && bpmIndex < eventLength-1 && pulse > bms.bpm_events[bpmIndex].y)
+        if (eventCounter >= eventLength)
+            return;
+
+        if(bms.bmsEvents[eventCounter].y < pulse)
         {
-            pulseConstant = bms.bpm_events[bpmIndex].bpm * bms.info.resolution / (60 * 4);
-            bpmText.text = "Bpm: " + bms.bpm_events[bpmIndex].bpm;
-            bpmIndex++;
+            while(eventCounter < eventLength && bms.bmsEvents[eventCounter].y < pulse)
+            {
+                try
+                {
+                    ExecuteBmsEvent(bms.bmsEvents[eventCounter]);
+                }
+                catch
+                {
+                    Debug.Log("Error:Event #" + eventCounter);
+                }
+                eventCounter++;
+            }
         }
 
-        pulse100000 += (ulong)(Time.deltaTime * 100000 * pulseConstant);
+        bmsTime += Time.deltaTime;
+        TimeSpan timeSpan = TimeSpan.FromSeconds(bmsTime);
+        ulong deltaPulse100000 = (ulong)(Time.deltaTime * 131072 * pulseConstant);
+        pulse100000 += deltaPulse100000;
+        pulse = pulse100000 / 131072;
+        pulseText.text = "Pulse: " + pulse + "/" + lastPulse;
+        timeText.text = "Time: " + string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
 
-        pulse = pulse100000 / 100000;
+        slider.transform.position = new Vector3(-2.33f, -2 - (float)(pulse * (highSpeed / pulseConstant)) * highSpeedConstant);
+    }
 
-        if(notePlayers == null)
+    
+    void NotePlacement()
+    {
+        foreach(BmsEvent be in bms.bmsEvents)
         {
+            if(be.eventType == BMSParser_new.EventType.NoteEvent)
+            {
+                NoteEvent ne = (NoteEvent)be;
+                GameObject drawPrefab = noteWhite;
+                float xPos = 0.16f;
+                bool drawFlag = true;
+                if(ne.x >= 1 && ne.x <= 7)
+                {
+                    xPos *= ne.x;
+                    if ((ne.x % 2) == 1)
+                        drawPrefab = noteWhite;
+                    else
+                        drawPrefab = noteBlue;
+                }
+                else if(ne.x == 8)
+                {
+                    drawPrefab = noteScratch;
+                    xPos = 0f;
+                }
+                else
+                {
+                    drawFlag = false;
+                }
+                if (drawFlag)
+                {
+                    GameObject note = Instantiate(drawPrefab) as GameObject;
+                    note.transform.SetParent(slider.transform);
+                    note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                }
+            }
+            else if(be.eventType == BMSParser_new.EventType.LineEvent)
+            {
+                GameObject line = Instantiate(linePre) as GameObject;
+                line.transform.SetParent(slider.transform);
+                line.transform.position = new Vector3(-2.33f, (float)(be.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+            }
+        }
+    }
+
+    void ExecuteBmsEvent(BmsEvent be)
+    {
+        if(be == null)
+        {
+            Debug.Log("Null BmsEvent");
             return;
         }
-        foreach (NotePlayer np in notePlayers)
-        {
-            np.pulse = pulse;
-        }
+
+        if (be.eventType == BMSParser_new.EventType.BGAEvent ||
+            be.eventType == BMSParser_new.EventType.LayerEvent ||
+            be.eventType == BMSParser_new.EventType.PoorEvent)
+            ExecuteBgaEvent((BGAEvent)be);
+        else if (be.eventType == BMSParser_new.EventType.BpmEvent)
+            ExecuteBpmEvent((BpmEvent)be);
+        else if (be.eventType == BMSParser_new.EventType.LineEvent)
+            ExecuteLineEvent((LineEvent)be);
+        else if (be.eventType == BMSParser_new.EventType.NoteEvent)
+            ExecuteNoteEvent((NoteEvent)be);
+        else if (be.eventType == BMSParser_new.EventType.StopEvent)
+            ExecuteStopEvent((StopEvent)be);
+
+    }
+
+    void ExecuteBgaEvent(BGAEvent bgE)
+    {
         //change bga sprite
-        if (bms.bga.bga_events.Count != 0 && bgIndex < eventLength && pulse > bms.bga.bga_events[bgIndex].y)
+        if (bgE.eventType == BMSParser_new.EventType.BGAEvent)
         {
-            bgImage.sprite = bgaSprites[bms.bga.bga_events[bgIndex].id];
-            bgaText.text = "BGA: " + bms.bga.bga_header.Find(x => x.id == bms.bga.bga_events[bgIndex].id).name;
-            bgIndex++;
+            if (bgaSprites.Length <= (int)bgE.id)
+            {
+                bgImage.sprite = null;
+                return;
+            }
+                
+
+            bgImage.sprite = bgaSprites[bgE.id];
+            bgaText.text = "BGA: " + bgaSprites[bgE.id].name;
             if (bgImage.sprite == null)
             {
-                Debug.Log("Sprite Missing: " + bms.bga.bga_header.Find(x => x.id == bms.bga.bga_events[layerIndex].id).name);
+                Debug.Log("Sprite Missing: " + bgaSprites[bgE.id].name);
             }
             else
             {
+                //TODO scale aspect ratio option
                 bga.transform.localScale = new Vector3(
                 worldScreenHeight / bgImage.sprite.bounds.size.x,
                 worldScreenHeight / bgImage.sprite.bounds.size.y, 1);
-                
-                Debug.Log(bms.bga.bga_header.Find(x => x.id == bms.bga.bga_events[layerIndex].id).name);
             }
         }
-
-        //change layer sprite
-        
-        if (bms.bga.layer_events.Count != 0 && layerIndex < eventLength && pulse > bms.bga.layer_events[layerIndex].y)
+        else if (bgE.eventType == BMSParser_new.EventType.LayerEvent)
         {
-            layerImage.sprite = layerSprites[bms.bga.layer_events[layerIndex].id];
-            layerIndex++;
-            layerText.text = "Layer: " + bms.bga.bga_header.Find(x => x.id == bms.bga.layer_events[layerIndex].id).name;
+            if (layerSprites.Length <= (int)bgE.id)
+            {
+                layerImage.sprite = null;
+                return;
+            }
+
+            layerImage.sprite = layerSprites[bgE.id];
+            layerText.text = "Layer: " + layerSprites[bgE.id].name;
             if (layerImage.sprite == null)
             {
-                Debug.Log("Sprite Missing: " + bms.bga.bga_header.Find(x => x.id == bms.bga.layer_events[layerIndex].id).name);
+                Debug.Log("Sprite Missing: " + layerSprites[bgE.id].name);
             }
             else
             {
                 bgaLayer.transform.localScale = new Vector3(
                 worldScreenHeight / layerImage.sprite.bounds.size.x,
                 worldScreenHeight / layerImage.sprite.bounds.size.y, 1);
-                
+
             }
         }
-
-        pulseText.text = "Pulse: " + pulse + "/192";
-
     }
 
+    void ExecuteBpmEvent(BpmEvent be)
+    {
+        pulseConstant = be.bpm * bms.info.resolution / (60 * 4);
+        bpmText.text = "Bpm: " + be.bpm;
+    }
+
+    void ExecuteLineEvent(LineEvent be)
+    {
+        measure++;
+        measureText.text = "Measure: " + measure + "/" + bms.info.maxMeasure;
+    }
+    void ExecuteNoteEvent(NoteEvent be)
+    {
+        try
+        {
+            AudioSource audioSource = soundObjects[be.id].GetComponent<AudioSource>();
+            if (audioSource.clip.isReadyToPlay)
+                audioSource.Play();
+            else
+                Debug.Log(audioSource.clip.name);
+        }
+        catch
+        {
+            Debug.Log("Audio File '" + bms.info.soundHeaders[(int)be.id].name + "' missing");
+        }
+    }
+    void ExecuteStopEvent(StopEvent be)
+    {
+
+    }
     //doesn't support bmp
     public static Texture2D LoadImageFromPath(string filePath)
     {
@@ -158,22 +317,47 @@ public class GameController : MonoBehaviour {
 
         if (File.Exists(filePath))
         {
-            fileData = File.ReadAllBytes(filePath);
-            tex = new Texture2D(256, 256);
-            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+            if (String.Equals(Path.GetExtension(filePath).ToLower(), ".bmp"))
+            {
+                Bitmap bitmap = new Bitmap(filePath);
+                tex = new Texture2D(bitmap.Width, bitmap.Height);
+                for (int x = 0; x < bitmap.Width; x++)
+                {
+                    for (int y = 0; y < bitmap.Height; y++)
+                    {
+                        System.Drawing.Color pixel = bitmap.GetPixel(x, y);
+                        float r = Normalize(pixel.R, 0f, 255f);
+                        float g = Normalize(pixel.G, 0f, 255f);
+                        float b = Normalize(pixel.B, 0f, 255f);
+                        tex.SetPixel(x, bitmap.Height-y-1, new UnityEngine.Color(r,g,b));
+                    }
+                }
+            }
+            else
+            {
+                fileData = File.ReadAllBytes(filePath);
+                tex = new Texture2D(256, 256);
+                tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+            }
         }
         return tex;
+    }
+
+    public static float Normalize(float current, float min, float max)
+    {
+        return (current - min) / (max - min);
     }
     
     //old bga used Black as Transparent Color
     public static Texture2D BlackToTransparent(Texture2D tex)
     {
-        Color[] pix = tex.GetPixels(0, 0, tex.width, tex.height);
-        Color black = new Color(0, 0, 0);
+        UnityEngine.Color[] pix = tex.GetPixels(0, 0, tex.width, tex.height); 
         for(int p = 0; p<pix.Length; p++)
         {
-            if(pix[p] == black)
-                pix[p].a = 0;            
+            if(pix[p].r == 0 && pix[p].g == 0 && pix[p].b == 0)
+            {
+                pix[p].a = 0;
+            }
         }
         tex.SetPixels(0, 0, tex.width, tex.height, pix);
         tex.Apply();
@@ -185,30 +369,35 @@ public class GameController : MonoBehaviour {
         Texture2D bgaTexture;
         foreach (BGAHeader bh in bms.bga.bga_header)
         {
-            string path = bms.path.Substring(0, bms.path.LastIndexOf("/") + 1) + bh.name;
+            string path = bms.path + "\\" + bh.name;
+
+            if(!File.Exists(path))
+                path = Path.ChangeExtension(path, ".png");
+            if(!File.Exists(path))
+                path = Path.ChangeExtension(path, ".jpg");
+            if (!File.Exists(path))
+                path = Path.ChangeExtension(path, ".bmp");
+
             bgaTexture = LoadImageFromPath(path);
-            if(bgaTexture == null)
-            {
-                Debug.Log("BGA File Missing!: " + path);
-            }
-            else
+            if(bgaTexture != null)
             {
                 bgaSprites[bh.id] = Sprite.Create(bgaTexture, new Rect(0, 0, bgaTexture.width, bgaTexture.height), new Vector2(0, 0));
+                bgaSprites[bh.id].name = bh.name;
                 layerSprites[bh.id] = Sprite.Create(BlackToTransparent(bgaTexture), new Rect(0, 0, bgaTexture.width, bgaTexture.height), new Vector2(0, 0));
+                layerSprites[bh.id].name = bh.name;
             }
         }
     }
 
-    void LoadSound(List<SoundChannel> sound_channels)
+    void LoadSound(List<SoundHeader> sound_channels)
     {
         Transform soundTrans = GameObject.Find("Sound").transform;
 
-        Debug.Log("Sound_Channel Count: " + sound_channels.Count);
-        foreach (SoundChannel sc in sound_channels)
+        foreach (SoundHeader sc in sound_channels)
         {
             if (sc.name != "")
             {
-                string path = bms.path.Substring(0, bms.path.LastIndexOf("/") + 1) + sc.name;
+                string path = bms.path + "\\" + sc.name;
 
                 if (!File.Exists(path) && String.Equals(Path.GetExtension(path).ToLower(), ".wav"))
                 {
@@ -217,11 +406,11 @@ public class GameController : MonoBehaviour {
 
                 if (File.Exists(path))
                 {
-                    GameObject scPre = Instantiate(soundchannelpre) as GameObject;
-                    scPre.name = sc.name;
-                    scPre.transform.SetParent(soundTrans);
+                    soundObjects[sc.id] = Instantiate(soundchannelpre) as GameObject;
+                    soundObjects[sc.id].name = sc.name;
+                    soundObjects[sc.id].transform.SetParent(soundTrans);
 
-                    WWW www = new WWW("file:///" + path);
+                    WWW www = new WWW("file:///" + path.Replace("#", "%23"));
 
                     AudioClip clip = www.GetAudioClip(false, false);
                     /*
@@ -233,13 +422,10 @@ public class GameController : MonoBehaviour {
                     */
                     clip.name = Path.GetFileName(path);
 
-                    scPre.GetComponent<AudioSource>().clip = clip;
-                    scPre.GetComponent<NotePlayer>().notes = sc.notes;
+                    soundObjects[sc.id].GetComponent<AudioSource>().clip = clip;
                 }
-                
             }
         }
-        notePlayers = GameObject.Find("Sound").GetComponentsInChildren<NotePlayer>();
 
     }
 }

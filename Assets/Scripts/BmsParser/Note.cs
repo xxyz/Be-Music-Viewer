@@ -2,7 +2,7 @@
 
 namespace BMSParser_new
 {
-    public class Note
+    class Note
     {
         public int x; //lane number(1~7: note, 8: scratch...)
         public ulong y; //pulse number

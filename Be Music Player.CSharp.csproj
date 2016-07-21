@@ -70,6 +70,9 @@
     <Reference Include="Ude">
       <HintPath>Assets\Plugin\Ude.dll</HintPath>
     </Reference>
+    <Reference Include="System.Drawing">
+      <HintPath>Assets\Plugin\System.Drawing.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Assets\Scripts\BmsParser\BGA.cs" />
@@ -79,11 +82,14 @@
     <Compile Include="Assets\Scripts\BmsParser\BMSInfo.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BMSParser.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BarLine.cs" />
+    <Compile Include="Assets\Scripts\BmsParser\BmsEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BpmEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BpmHeader.cs" />
-    <Compile Include="Assets\Scripts\BmsParser\LoadImage.cs" />
+    <Compile Include="Assets\Scripts\BmsParser\LineEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\Note.cs" />
+    <Compile Include="Assets\Scripts\BmsParser\NoteEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\SoundChannel.cs" />
+    <Compile Include="Assets\Scripts\BmsParser\SoundHeader.cs" />
     <Compile Include="Assets\Scripts\BmsParser\StopEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\StopHeader.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />

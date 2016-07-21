@@ -10,8 +10,7 @@ namespace BMSParser_new
         public string artist;
         public List<string> subartists = new List<string>();
         public string genre;
-        //mode_hint's possible values: beat-5k, beat-7k, beat-10k, beatk14k, popn-5k, popn-9k 
-        public string mode_hint = "beat-7k";
+        public string mode_hint = "beat-7k";//mode_hint's possible values: beat-5k, beat-7k, beat-10k, beatk14k, popn-5k, popn-9k 
         public string chart_name;
         public ulong level;
         public double init_bpm;
@@ -28,8 +27,13 @@ namespace BMSParser_new
         public int difficulty;
         public string back_bmp; //title picture(#backbmp)
         public string comment;
-        public BpmHeader[] bpmHeaders = new BpmHeader[1322];
-        public StopHeader[] stopHeaders = new StopHeader[1322];
+
+        public List<BpmHeader> bpmHeaders = new List<BpmHeader>(new BpmHeader[1322]);
+        public List<StopHeader> stopHeaders = new List<StopHeader>(new StopHeader[1322]);
+        public List<SoundHeader> soundHeaders = new List<SoundHeader>();
+        
+
+
         public int lnObj = -1;
 
         public int maxMeasure;

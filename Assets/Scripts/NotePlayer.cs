@@ -4,7 +4,7 @@ using BMSParser_new;
 using System.Collections.Generic;
 
 public class NotePlayer : MonoBehaviour {
-
+    /*
     public List<Note> notes;
     public ulong pulse;
 
@@ -30,4 +30,5 @@ public class NotePlayer : MonoBehaviour {
             }
         }
     }
+    */
 }

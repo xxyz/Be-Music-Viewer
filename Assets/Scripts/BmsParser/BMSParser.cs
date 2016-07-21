@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using I18N;
-using I18N.CJK;
 
 namespace BMSParser_new
 {
     class BMSParser
     {
-        private int maxMeasure = 0;
+
+        private List<int> measureSetIndex = new List<int>();
 
         public BMS Parse(string path)
         {
@@ -25,8 +24,7 @@ namespace BMSParser_new
                 Ude.CharsetDetector cdet = new Ude.CharsetDetector();
                 cdet.Feed(fs);
                 cdet.DataEnd();
-                //creating weird encdoing error only in Unity...
-                if(/*cdet.Charset != null*/ false)
+                if(cdet.Charset != null)
                 {
                     Console.WriteLine("Charset: {0}, confidence: {1}", cdet.Charset, cdet.Confidence);
                     encoding = Encoding.GetEncoding(cdet.Charset);
@@ -39,16 +37,14 @@ namespace BMSParser_new
 
             using (StreamReader sr = new StreamReader(path, encoding))
             {
-                bms.path = path;
-                
-                //Addnon-sound channel
-                bms.sound_channels.Add(new SoundChannel(-1, ""));
+                bms.path = Directory.GetParent(path).FullName;
 
                 while((line = sr.ReadLine()) != null)
                 {
                     ProcessBMSLine(line.Trim(), bms);
                 }
             }
+
             CalculatePulse(bms);
 
             return bms;
@@ -56,7 +52,6 @@ namespace BMSParser_new
 
         private void ProcessBMSLine(String line, BMS bms)
         {
-
             char[] seperators = { ' ', '\t', '　' };
             String[] args = line.Split(seperators, 2);
 
@@ -70,7 +65,7 @@ namespace BMSParser_new
                 if (args[0].StartsWith("#WAV")) //add soundchannel, note information will be added later.
                 {
                     int id = HexToInt(args[0].Substring(4, 2));
-                    bms.sound_channels.Add( new SoundChannel(id, args[1]) );
+                    bms.info.soundHeaders.Add( new SoundHeader(id, args[1]) );
                 }
                 else if (args[0].StartsWith("#BMP"))
                 {
@@ -86,7 +81,7 @@ namespace BMSParser_new
                     int id = HexToInt(args[0].Substring(4, 2));
                     bms.info.bpmHeaders[id] =  new BpmHeader(id, Convert.ToDouble(args[1]));
                 }
-                else if (args[0].StartsWith("#STOP")) //Stop events, pulse should be filled after processing lines
+                else if (args[0].StartsWith("#STOP")) //Stop events
                 {
                     int id = HexToInt(args[0].Substring(5, 2));
                     bms.info.stopHeaders[id] = new StopHeader(id, Convert.ToUInt64(args[1]));
@@ -179,17 +174,18 @@ namespace BMSParser_new
 
                 if (args.Count() < 2 || args[0].Length < 6)
                     return;
-
+                //TODO if 192 % args.count != 0 change resolution
                 int measure = Convert.ToInt32(args[0].Substring(1, 3));
                 int channel = HexToInt(args[0].Substring(4, 2));
 
-                if (maxMeasure < measure)
+                if (bms.info.maxMeasure < measure)
                     bms.info.maxMeasure = measure;
 
                 //measure length channel
                 if(channel == 2)
                 {
-                    bms.lines.Add( new BarLine(measure, Convert.ToDouble(args[1])) );
+                    bms.bmsEvents.Add(new LineEvent(measure, Convert.ToDouble(args[1])));
+                    measureSetIndex.Add(measure);
                     return;
                 }
 
@@ -210,46 +206,40 @@ namespace BMSParser_new
                         {
                             //channel 03 use 00-FF hex
                             int bpm = Convert.ToInt32(noteEnum.Current, 16);
-                            bms.bpm_events.Add(new BpmEvent(bpm, measure, measureDiv));
+                            bms.bmsEvents.Add(new BpmEvent(bpm, measure, measureDiv));
                         }
                         //bga base
                         else if(channel == 4)
                         {
-                            bms.bga.bga_events.Add(new BGAEvent(id, measure, measureDiv));
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.BGAEvent));
                         }
                         //bga poor
                         else if (channel == 6)
                         {
-                            bms.bga.poor_events.Add(new BGAEvent(id, measure, measureDiv));
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.PoorEvent));
                         }
                         //bga layer
                         else if(channel == 7)
                         {
-                            bms.bga.layer_events.Add(new BGAEvent(id, measure, measureDiv));
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.LayerEvent));
                         }
                         //channel 08 => Find bpm from bpmHeader and add BpmEvent
                         else if (channel == 8)
                         {
-                            double bpm = bms.info.bpmHeaders[id].bpm;
-                            bms.bpm_events.Add(new BpmEvent(bpm, measure, measureDiv));
+                            double bpm = bms.info.bpmHeaders.Find(x => (x != null && x.id == id)).bpm;
+                            bms.bmsEvents.Add(new BpmEvent(bpm, measure, measureDiv));
                         }
                         //stop
                         else if(channel == 9)
                         {
-                            ulong stopDuration = bms.info.stopHeaders[id].duration;
-                            bms.stop_events.Add(new StopEvent(stopDuration, measure, measureDiv));
+                            ulong stopDuration = bms.info.stopHeaders.Find(x => (x != null && x.id == (ulong)id)).duration;
+                            bms.bmsEvents.Add(new StopEvent(stopDuration, measure, measureDiv));
                         }
                         //note channel
                         else
                         {
-                            SoundChannel sc = bms.sound_channels.Find(x => x.id == id);
-                            
-                            //non-sound note channel
-                            if (sc == null)
-                                sc = bms.sound_channels.Find(x => x.id == -1);
-
                             int bmsOnChannel = getBmsOnX(channel);
-                            sc.notes.Add(new Note(bmsOnChannel, measure, measureDiv));
+                            bms.bmsEvents.Add(new NoteEvent(bmsOnChannel, 0, true, id, measure, measureDiv));
                         }
                     }
                     argIndex++;
@@ -259,59 +249,41 @@ namespace BMSParser_new
 
         private void CalculatePulse(BMS bms)
         {
-            ulong accumPulse = 0;
-            for (int i = 0; i <= bms.info.maxMeasure; i++)
+            //fill omitted line events
+            for(int i = 1; i <= bms.info.maxMeasure; i++)
             {
-                BarLine barLine = bms.lines.Find(x => x.measureNum == i);
-                if (barLine == null)
+                if(!measureSetIndex.Contains(i))
                 {
-                    barLine = new BarLine(i, 1);
-                    bms.lines.Add(barLine);
+                    bms.bmsEvents.Add(new LineEvent(i, 1));
                 }
-
-                barLine.accumPulse = accumPulse;
-                barLine.y = (ulong)(bms.info.resolution * barLine.measureLength + accumPulse);
-
-
-                accumPulse += (ulong)(bms.info.resolution * barLine.measureLength);
             }
-            bms.lines = bms.lines.OrderBy(o => o.y).ToList();
 
-            foreach(SoundChannel sc in bms.sound_channels)
+            bms.bmsEvents.Sort();
+            
+            ulong[] accumYList = new ulong[bms.info.maxMeasure+10];
+            double[] measureLengthList = Enumerable.Repeat((double)1, bms.info.maxMeasure + 1).ToArray();
+
+            for (int i = 0; i < bms.bmsEvents.Count(); i++)
             {
-                foreach(Note note in sc.notes)
+                if (bms.bmsEvents[i].eventType == EventType.LineEvent)
                 {
-                    note.y = (ulong)(bms.info.resolution * note.measureDiv + bms.lines[note.measureNum].accumPulse);
+                    measureLengthList[bms.bmsEvents[i].measure] = ((LineEvent)bms.bmsEvents[i]).measureLength;
                 }
-                sc.notes = sc.notes.OrderBy(o => o.y).ToList();
             }
-            foreach(BpmEvent be in bms.bpm_events)
+            
+            //fill accumYList
+            accumYList[0] = 0;
+            for (int i = 1; i <= measureLengthList.Length; i++)
             {
-                be.y = (ulong)(bms.info.resolution * be.measureDiv + bms.lines[be.measureNum].accumPulse);
+                accumYList[i] = accumYList[i - 1] + (ulong)(measureLengthList[i - 1] * bms.info.resolution);
             }
-
-            foreach(StopEvent se in bms.stop_events)
+            
+            //calcY bmsEvents and resolution
+            foreach (BmsEvent be in bms.bmsEvents)
             {
-                se.y = (ulong)(bms.info.resolution * se.measureDiv + bms.lines[se.measureNum].accumPulse);
+                be.calcY(bms.info.resolution, measureLengthList[be.measure], accumYList[be.measure]);
             }
-
-            foreach(BGAEvent be in bms.bga.bga_events)
-            {
-                be.y = (ulong)(bms.info.resolution * be.measureDiv + bms.lines[be.measureNum].accumPulse);
-            }
-            bms.bga.bga_events = bms.bga.bga_events.OrderBy(o => o.y).ToList();
-
-            foreach (BGAEvent be in bms.bga.poor_events)
-            {
-                be.y = (ulong)(bms.info.resolution * be.measureDiv + bms.lines[be.measureNum].accumPulse);
-            }
-            bms.bga.poor_events = bms.bga.poor_events.OrderBy(o => o.y).ToList();
-
-            foreach (BGAEvent be in bms.bga.layer_events)
-            {
-                be.y = (ulong)(bms.info.resolution * be.measureDiv + bms.lines[be.measureNum].accumPulse);
-            }
-            bms.bga.layer_events = bms.bga.layer_events.OrderBy(o => o.y).ToList();
+            bms.bmsEvents.Sort();
         }
 
         private int getBmsOnX(int channel)
@@ -334,7 +306,8 @@ namespace BMSParser_new
                 return 16;
             return 0;
         }
-
+        
+        
         //split string by chunkSize
         public static IEnumerable<string> Split(string str, int chunkSize)
         {
@@ -342,7 +315,7 @@ namespace BMSParser_new
                 .Select(i => str.Substring(i * chunkSize, chunkSize));
         }
         //Hexadecimal to Int
-        public static int HexToInt(String hex)
+        public static int HexToInt(string hex)
         {
             String sample = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
             int result = 0;
