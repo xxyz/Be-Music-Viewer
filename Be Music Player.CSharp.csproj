@@ -61,17 +61,17 @@
     <Reference Include="UnityEditor">
       <HintPath>Library\UnityAssemblies\UnityEditor.dll</HintPath>
     </Reference>
-    <Reference Include="I18N.CJK">
-      <HintPath>Assets\Plugin\I18N.CJK.dll</HintPath>
+    <Reference Include="Ude">
+      <HintPath>Assets\Plugins\Ude.dll</HintPath>
     </Reference>
     <Reference Include="I18N">
-      <HintPath>Assets\Plugin\I18N.dll</HintPath>
+      <HintPath>Assets\Plugins\I18N.dll</HintPath>
     </Reference>
-    <Reference Include="Ude">
-      <HintPath>Assets\Plugin\Ude.dll</HintPath>
+    <Reference Include="I18N.CJK">
+      <HintPath>Assets\Plugins\I18N.CJK.dll</HintPath>
     </Reference>
     <Reference Include="System.Drawing">
-      <HintPath>Assets\Plugin\System.Drawing.dll</HintPath>
+      <HintPath>Assets\Plugins\System.Drawing.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -93,6 +93,12 @@
     <Compile Include="Assets\Scripts\BmsParser\StopEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\StopHeader.cs" />
     <Compile Include="Assets\Scripts\GameController.cs" />
+    <Compile Include="Assets\Scripts\GstUnityBridge\EventProcessor.cs" />
+    <Compile Include="Assets\Scripts\GstUnityBridge\GStreamer.cs" />
+    <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgeCapture.cs" />
+    <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgePipeline.cs" />
+    <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgeTexture.cs" />
+    <Compile Include="Assets\Scripts\MixLevels.cs" />
     <Compile Include="Assets\Scripts\NotePlayer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\SyntaxTree\UnityVS\2015\UnityVS.CSharp.targets" />

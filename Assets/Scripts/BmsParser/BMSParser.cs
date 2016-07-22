@@ -24,6 +24,7 @@ namespace BMSParser_new
                 Ude.CharsetDetector cdet = new Ude.CharsetDetector();
                 cdet.Feed(fs);
                 cdet.DataEnd();
+                /*
                 if(cdet.Charset != null)
                 {
                     Console.WriteLine("Charset: {0}, confidence: {1}", cdet.Charset, cdet.Confidence);
@@ -33,6 +34,7 @@ namespace BMSParser_new
                 {
                     Console.WriteLine("Detection Failed");
                 }
+                */
             }
 
             using (StreamReader sr = new StreamReader(path, encoding))
