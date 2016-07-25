@@ -11,14 +11,26 @@ using UnityEngine.Audio;
 public class GameController : MonoBehaviour {
 
     public string BmsPath;
+    public UnityEngine.Font[] judgeFonts;
+    public Sprite[] judgeSprites;
     public GameObject soundchannelpre;
+
     public GameObject noteScratch;
     public GameObject noteWhite;
     public GameObject noteBlue;
+    public GameObject noteWhiteLn;
+    public GameObject noteBlueLn;
+    public GameObject noteScratchLn;
+
     public GameObject linePre;
     public GameObject slider;
+
     public GameObject bga;
     public GameObject bgaLayer;
+    public GameObject bgaVideo;
+    public GameObject bgaLayerVideo;
+
+    private GameObject judge;
     public AudioMixerGroup keyMixer;
     public AudioMixerGroup backMixer;
     public ulong pulseOffset = 0;
@@ -41,6 +53,7 @@ public class GameController : MonoBehaviour {
     private double bmsTime = 0;
     private uint measure = 0;
     private ulong lastPulse;
+    private int combo = 0;
 
     private const float highSpeedConstant = 0.01f;
     private double pulseConstant;
@@ -49,25 +62,37 @@ public class GameController : MonoBehaviour {
     private float worldScreenWidth;
 
     private Text titleText, subtitleText, artistText, bpmText, bgaText, soundText, 
-        layerText, pulseText, genreText, timeText, measureText, totalText, resolutionText;
-
+        layerText, pulseText, genreText, timeText, measureText, totalText, resolutionText, comboText;
+    private UnityEngine.UI.Image judgeImage;
 
     private AudioSource[] audioSources;
 
-    void Start ()
+    private GstUnityBridgeTexture gstBga;
+    private GstUnityBridgeTexture gstLayer;
+
+    void Awake ()
     {
         //set camera variables
         worldScreenHeight = Camera.main.orthographicSize * 2;
         worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
 
+        if(LoadBMS.path != "" && LoadBMS.path != null)
+            BmsPath = LoadBMS.path;
+
         //parse BMS
         BMSParser bmsParser = new BMSParser();
         bms = bmsParser.Parse(BmsPath);
 
+        if(bms == null)
+        {
+            Debug.Log("Parsing Failed");
+        }
+
         //get components
         bgImage = bga.GetComponent<SpriteRenderer>();
         layerImage = bgaLayer.GetComponent<SpriteRenderer>();
-        
+        gstBga = bgaVideo.GetComponent<GstUnityBridgeTexture>();
+        gstLayer = bgaLayerVideo.GetComponent<GstUnityBridgeTexture>();
 
         //set variables
         ulong maxSoundObjectId = 0;
@@ -93,6 +118,8 @@ public class GameController : MonoBehaviour {
         pulseConstant = bms.info.init_bpm * bms.info.resolution / (60 * 4);
         lastPulse = bms.bmsEvents[bms.bmsEvents.Count - 1].y;
 
+        judge = GameObject.Find("Judge");
+        judgeImage = GameObject.Find("JudgeImage").GetComponent<UnityEngine.UI.Image>();
         titleText = GameObject.Find("TitleText").GetComponent<Text>();
         subtitleText = GameObject.Find("SubtitleText").GetComponent<Text>();
         artistText = GameObject.Find("ArtistText").GetComponent<Text>();
@@ -106,6 +133,7 @@ public class GameController : MonoBehaviour {
         totalText = GameObject.Find("TotalText").GetComponent<Text>();
         resolutionText = GameObject.Find("ResolutionText").GetComponent<Text>();
         soundText = GameObject.Find("SoundCountText").GetComponent<Text>();
+        comboText = GameObject.Find("ComboText").GetComponent<Text>();
 
 
         soundObjects = new GameObject[maxSoundObjectId+10];
@@ -183,6 +211,7 @@ public class GameController : MonoBehaviour {
             {
                 NoteEvent ne = (NoteEvent)be;
                 GameObject drawPrefab = noteWhite;
+                GameObject drawLnPrefab = noteWhiteLn;
                 float xPos = 0.16f;
                 bool drawFlag = true;
                 if(ne.x >= 1 && ne.x <= 7)
@@ -191,11 +220,16 @@ public class GameController : MonoBehaviour {
                     if ((ne.x % 2) == 1)
                         drawPrefab = noteWhite;
                     else
+                    {
                         drawPrefab = noteBlue;
+                        drawLnPrefab = noteBlueLn;
+                    }
+                        
                 }
                 else if(ne.x == 8)
                 {
                     drawPrefab = noteScratch;
+                    drawLnPrefab = noteScratchLn;
                     xPos = 0f;
                 }
                 else
@@ -207,6 +241,14 @@ public class GameController : MonoBehaviour {
                     GameObject note = Instantiate(drawPrefab) as GameObject;
                     note.transform.SetParent(slider.transform);
                     note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                    //ln
+                    if(ne.l > 0)
+                    {
+                        GameObject lnNote = Instantiate(drawLnPrefab) as GameObject;
+                        lnNote.transform.SetParent(slider.transform);
+                        lnNote.transform.position = new Vector3(xPos - 2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                        lnNote.transform.localScale = new Vector3(1, (worldScreenHeight / 200 * 10000) * ne.l * (float)((highSpeed / pulseConstant)) * highSpeedConstant, 1);
+                    }
                 }
             }
             else if(be.eventType == BMSParser_new.EventType.LineEvent)
@@ -243,21 +285,31 @@ public class GameController : MonoBehaviour {
 
     void ExecuteBgaEvent(BGAEvent bgE)
     {
+        //sprite Missing
+        if (bgaSprites.Length <= (int)bgE.id || (!bgE.isVideo && bgaSprites[bgE.id] == null))
+        {
+            Debug.Log(bgE.isVideo);
+            Debug.Log("Sprite Missing! Id(" + bgE.id + ")");
+            if (bgE.eventType == BMSParser_new.EventType.BGAEvent)
+                bgImage.sprite = null;
+            else
+                layerImage.sprite = null;
+            return;
+        }
+
         //change bga sprite
         if (bgE.eventType == BMSParser_new.EventType.BGAEvent)
         {
-            if (Path.GetExtension(bgaSprites[bgE.id].name) == ".mpg")
-            {
-                bgaLayer.GetComponent<GstUnityBridgeTexture>().Play();
-                return;
-            }
-
-            if (bgaSprites.Length <= (int)bgE.id)
+            if (bgE.isVideo)
             {
                 bgImage.sprite = null;
+                string fileName = bms.bga.bga_header.Find(x => x.id == bgE.id).name;
+                gstBga.m_URI = "file:///"+ Uri.EscapeUriString((bms.path + "/" + fileName).Replace("\\", "/"));
+                gstBga.enabled = true;
+                bgaText.text = "BGA: " + fileName;
                 return;
             }
-                
+            
 
             bgImage.sprite = bgaSprites[bgE.id];
             bgaText.text = "BGA: " + bgaSprites[bgE.id].name;
@@ -270,6 +322,7 @@ public class GameController : MonoBehaviour {
             }
             else
             {
+                gstBga.enabled = false;
                 //TODO scale aspect ratio option
                 bga.transform.localScale = new Vector3(
                 worldScreenHeight / bgImage.sprite.bounds.size.x,
@@ -278,13 +331,15 @@ public class GameController : MonoBehaviour {
         }
         else if (bgE.eventType == BMSParser_new.EventType.LayerEvent)
         {
-            if (layerSprites.Length <= (int)bgE.id || layerSprites[bgE.id] == null)
+            if (bgE.isVideo)
             {
-                Debug.Log("Sprite Missing: ID " + bgE.id);
                 layerImage.sprite = null;
+                string fileName = bms.bga.bga_header.Find(x => x.id == bgE.id).name;
+                gstLayer.m_URI = "file:///" + (bms.path + "/" + fileName).Replace("\\", "/");
+                gstLayer.enabled = true;
+                layerText.text = "Layer: " + fileName;
                 return;
             }
-
             layerImage.sprite = layerSprites[bgE.id];
             layerText.text = "Layer: " + layerSprites[bgE.id].name;
             if (layerImage.sprite == null)
@@ -319,11 +374,15 @@ public class GameController : MonoBehaviour {
         {
             AudioSource audioSource = soundObjects[be.id].GetComponent<AudioSource>();
             AudioMixerGroup targetMixer = backMixer;
+
             if (audioSource.clip.loadState == AudioDataLoadState.Loaded)
             {
                 if(be.x != 0)
                 {
                     targetMixer = keyMixer;
+                    combo++;
+                    StopCoroutine("ShowCombo");
+                    StartCoroutine("ShowCombo", be.y);
                 }
                 audioSource.outputAudioMixerGroup = targetMixer;
                 audioSource.Play();
@@ -343,6 +402,23 @@ public class GameController : MonoBehaviour {
     {
 
     }
+
+    IEnumerator ShowCombo(ulong length)
+    {
+
+        judge.SetActive(true);
+        comboText.text = combo.ToString();
+        for (int i = 102; i >= 0; i--)
+        {
+            judgeImage.sprite = judgeSprites[i % 3];
+            comboText.font = judgeFonts[i % 3];
+            yield return new WaitForSeconds(0.03f);
+            
+        }
+
+        judge.SetActive(false);
+    }
+
     //doesn't support bmp
     public static Texture2D LoadImageFromPath(string filePath)
     {
@@ -407,14 +483,9 @@ public class GameController : MonoBehaviour {
 
             string path = bms.path + "\\" + bh.name;
 
+
             if (Path.GetExtension(path) == ".mpg")
             {
-                Debug.Log("mpgmpg");
-                GstUnityBridgeTexture gst = bgaLayer.GetComponent<GstUnityBridgeTexture>();
-                gst.enabled = true;
-                gst.m_URI = "file:///" + path.Replace("\\", "/");
-                bgaSprites[bh.id] = Sprite.Create(new Texture2D(500, 500), new Rect(0, 0, 500, 500), new Vector2(0, 0));
-                bgaSprites[bh.id].name = bh.name;
                 return;
             }
 

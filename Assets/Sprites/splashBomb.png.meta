@@ -1,0 +1,875 @@
+fileFormatVersion: 2
+guid: d677f7b3c7b7033428cf8b507611ee0b
+timeCreated: 1469277354
+licenseType: Free
+TextureImporter:
+  fileIDToRecycleName:
+    21300000: splashBomb_0
+    21300002: splashBomb_1
+    21300004: splashBomb_2
+    21300006: splashBomb_3
+    21300008: splashBomb_4
+    21300010: splashBomb_5
+    21300012: splashBomb_6
+    21300014: splashBomb_7
+    21300016: splashBomb_8
+    21300018: splashBomb_9
+    21300020: splashBomb_10
+    21300022: splashBomb_11
+    21300024: splashBomb_12
+    21300026: splashBomb_13
+    21300028: splashBomb_14
+    21300030: splashBomb_15
+    21300032: splashBomb_16
+    21300034: splashBomb_17
+    21300036: splashBomb_18
+    21300038: splashBomb_19
+    21300040: splashBomb_20
+    21300042: splashBomb_21
+    21300044: splashBomb_22
+    21300046: splashBomb_23
+    21300048: splashBomb_24
+    21300050: splashBomb_25
+    21300052: splashBomb_26
+    21300054: splashBomb_27
+    21300056: splashBomb_28
+    21300058: splashBomb_29
+    21300060: splashBomb_30
+    21300062: splashBomb_31
+    21300064: splashBomb_32
+    21300066: splashBomb_33
+    21300068: splashBomb_34
+    21300070: splashBomb_35
+    21300072: splashBomb_36
+    21300074: splashBomb_37
+  serializedVersion: 2
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 1
+    linearTexture: 0
+    correctGamma: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 0
+  cubemapConvolution: 0
+  cubemapConvolutionSteps: 7
+  cubemapConvolutionExponent: 1.5
+  seamlessCubemap: 0
+  textureFormat: -1
+  maxTextureSize: 2048
+  textureSettings:
+    filterMode: -1
+    aniso: 16
+    mipBias: -1
+    wrapMode: 1
+  nPOTScale: 0
+  lightmap: 0
+  rGBM: 0
+  compressionQuality: 50
+  allowsAlphaSplitting: 0
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spritePixelsToUnits: 100
+  alphaIsTransparency: 1
+  textureType: 8
+  buildTargetSettings: []
+  spriteSheet:
+    sprites:
+    - name: splashBomb_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 36.98633, y: -26.625}
+        - {x: 30.986328, y: -38.625}
+        - {x: 30.986328, y: -87.625}
+        - {x: 32.98633, y: -89.625}
+        - {x: 71.98633, y: -89.625}
+        - {x: 78.98633, y: -82.625}
+        - {x: 78.98633, y: -35.625}
+        - {x: 77.98633, y: -26.625}
+    - name: splashBomb_1
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 70.458984, y: -22.625}
+        - {x: 42.458984, y: -22.625}
+        - {x: 29.458984, y: -37.625}
+        - {x: 29.458984, y: -76.625}
+        - {x: 34.458984, y: -88.625}
+        - {x: 48.458984, y: -93.625}
+        - {x: 67.458984, y: -93.625}
+        - {x: 83.458984, y: -80.625}
+        - {x: 83.458984, y: -43.625}
+        - {x: 78.458984, y: -25.625}
+    - name: splashBomb_2
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 33.43164, y: -24.625}
+        - {x: 30.43164, y: -39.625}
+        - {x: 30.43164, y: -83.625}
+        - {x: 39.43164, y: -91.625}
+        - {x: 68.43164, y: -91.625}
+        - {x: 83.43164, y: -80.625}
+        - {x: 83.43164, y: -27.625}
+        - {x: 77.43164, y: -24.625}
+    - name: splashBomb_3
+      rect:
+        serializedVersion: 2
+        x: 543
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 70.4043, y: -21.625}
+        - {x: 37.404297, y: -21.625}
+        - {x: 29.404297, y: -29.625}
+        - {x: 29.404297, y: -87.625}
+        - {x: 32.404297, y: -94.625}
+        - {x: 70.4043, y: -94.625}
+        - {x: 85.4043, y: -84.625}
+        - {x: 85.4043, y: -42.625}
+        - {x: 79.4043, y: -26.625}
+    - name: splashBomb_4
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 32.376953, y: -20.625}
+        - {x: 28.376953, y: -37.625}
+        - {x: 28.376953, y: -88.625}
+        - {x: 36.376953, y: -95.625}
+        - {x: 69.37695, y: -95.625}
+        - {x: 85.37695, y: -86.625}
+        - {x: 85.37695, y: -28.625}
+        - {x: 75.37695, y: -20.625}
+    - name: splashBomb_5
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 44.34961, y: -24.625}
+        - {x: 31.34961, y: -39.625}
+        - {x: 31.34961, y: -90.625}
+        - {x: 75.34961, y: -90.625}
+        - {x: 82.34961, y: -83.625}
+        - {x: 82.34961, y: -24.625}
+    - name: splashBomb_6
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 35.322266, y: -26.625}
+        - {x: 29.322266, y: -38.625}
+        - {x: 29.322266, y: -79.625}
+        - {x: 31.322266, y: -94.625}
+        - {x: 52.322266, y: -96.625}
+        - {x: 72.322266, y: -96.625}
+        - {x: 87.322266, y: -84.625}
+        - {x: 87.322266, y: -26.625}
+    - name: splashBomb_7
+      rect:
+        serializedVersion: 2
+        x: 1267
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 45.29492, y: -98.625}
+        - {x: 77.29492, y: -98.625}
+        - {x: 85.29492, y: -84.625}
+        - {x: 85.29492, y: -35.625}
+        - {x: 75.29492, y: -24.625}
+        - {x: 51.29492, y: -24.625}
+        - {x: 33.29492, y: -41.625}
+        - {x: 33.29492, y: -92.625}
+    - name: splashBomb_8
+      rect:
+        serializedVersion: 2
+        x: 1448
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 33.26758, y: -26.625}
+        - {x: 29.267578, y: -37.625}
+        - {x: 29.267578, y: -83.625}
+        - {x: 31.267578, y: -94.625}
+        - {x: 47.26758, y: -98.625}
+        - {x: 75.26758, y: -98.625}
+        - {x: 88.26758, y: -68.625}
+        - {x: 88.26758, y: -31.625}
+        - {x: 70.26758, y: -26.625}
+    - name: splashBomb_9
+      rect:
+        serializedVersion: 2
+        x: 1629
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 40.240234, y: -26.625}
+        - {x: 31.240234, y: -43.625}
+        - {x: 31.240234, y: -75.625}
+        - {x: 33.240234, y: -92.625}
+        - {x: 49.240234, y: -97.625}
+        - {x: 75.240234, y: -97.625}
+        - {x: 87.240234, y: -77.625}
+        - {x: 87.240234, y: -37.625}
+        - {x: 81.240234, y: -26.625}
+    - name: splashBomb_10
+      rect:
+        serializedVersion: 2
+        x: 1810
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 47.21289, y: -24.625}
+        - {x: 29.21289, y: -38.625}
+        - {x: 29.21289, y: -83.625}
+        - {x: 31.21289, y: -92.625}
+        - {x: 41.21289, y: -97.625}
+        - {x: 75.21289, y: -97.625}
+        - {x: 83.21289, y: -89.625}
+        - {x: 83.21289, y: -31.625}
+        - {x: 65.21289, y: -24.625}
+    - name: splashBomb_11
+      rect:
+        serializedVersion: 2
+        x: 1991
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 64.18555, y: -29.625}
+        - {x: 39.185547, y: -29.625}
+        - {x: 33.185547, y: -44.625}
+        - {x: 33.185547, y: -90.625}
+        - {x: 48.185547, y: -95.625}
+        - {x: 72.18555, y: -95.625}
+        - {x: 85.18555, y: -69.625}
+        - {x: 85.18555, y: -50.625}
+        - {x: 83.18555, y: -36.625}
+    - name: splashBomb_12
+      rect:
+        serializedVersion: 2
+        x: 2172
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 45.158203, y: -31.625}
+        - {x: 37.158203, y: -41.625}
+        - {x: 37.158203, y: -72.625}
+        - {x: 48.158203, y: -83.625}
+        - {x: 64.1582, y: -83.625}
+        - {x: 69.1582, y: -81.625}
+        - {x: 77.1582, y: -77.625}
+        - {x: 77.1582, y: -32.625}
+        - {x: 75.1582, y: -31.625}
+    - name: splashBomb_13
+      rect:
+        serializedVersion: 2
+        x: 2353
+        y: 576
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 71.13086, y: -31.625}
+        - {x: 36.13086, y: -31.625}
+        - {x: 36.13086, y: -78.625}
+        - {x: 45.13086, y: -82.625}
+        - {x: 47.13086, y: -83.625}
+        - {x: 68.13086, y: -83.625}
+        - {x: 78.13086, y: -68.625}
+        - {x: 78.13086, y: -47.625}
+        - {x: 77.13086, y: -42.625}
+    - name: splashBomb_14
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 22.986328, y: -19.875}
+        - {x: 14.986328, y: -33.875}
+        - {x: 14.986328, y: -90.875}
+        - {x: 35.98633, y: -111.875}
+        - {x: 96.98633, y: -111.875}
+        - {x: 96.98633, y: -19.875}
+    - name: splashBomb_15
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 39.458984, y: -19.875}
+        - {x: 30.458984, y: -21.875}
+        - {x: 26.458984, y: -31.875}
+        - {x: 26.458984, y: -72.875}
+        - {x: 30.458984, y: -91.875}
+        - {x: 40.458984, y: -97.875}
+        - {x: 73.458984, y: -97.875}
+        - {x: 86.458984, y: -95.875}
+        - {x: 88.458984, y: -85.875}
+        - {x: 88.458984, y: -36.875}
+        - {x: 76.458984, y: -19.875}
+    - name: splashBomb_16
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 47.43164, y: -31.875}
+        - {x: 36.43164, y: -43.875}
+        - {x: 36.43164, y: -74.875}
+        - {x: 37.43164, y: -85.875}
+        - {x: 77.43164, y: -85.875}
+        - {x: 77.43164, y: -46.875}
+        - {x: 70.43164, y: -31.875}
+    - name: splashBomb_17
+      rect:
+        serializedVersion: 2
+        x: 543
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 62.404297, y: -35.875}
+        - {x: 47.404297, y: -35.875}
+        - {x: 38.404297, y: -39.875}
+        - {x: 33.404297, y: -61.875}
+        - {x: 33.404297, y: -64.875}
+        - {x: 38.404297, y: -78.875}
+        - {x: 72.4043, y: -78.875}
+        - {x: 78.4043, y: -64.875}
+        - {x: 78.4043, y: -48.875}
+        - {x: 68.4043, y: -36.875}
+    - name: splashBomb_18
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 48.376953, y: -29.875}
+        - {x: 35.376953, y: -34.875}
+        - {x: 34.376953, y: -38.875}
+        - {x: 34.376953, y: -71.875}
+        - {x: 52.376953, y: -85.875}
+        - {x: 75.37695, y: -85.875}
+        - {x: 75.37695, y: -37.875}
+        - {x: 62.376953, y: -29.875}
+    - name: splashBomb_19
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 57.34961, y: -82.875}
+        - {x: 54.34961, y: -85.875}
+        - {x: 54.34961, y: -86.875}
+        - {x: 57.34961, y: -89.875}
+        - {x: 58.34961, y: -89.875}
+        - {x: 61.34961, y: -86.875}
+        - {x: 61.34961, y: -85.875}
+        - {x: 58.34961, y: -82.875}
+      - - {x: 42.34961, y: -24.875}
+        - {x: 38.34961, y: -31.875}
+        - {x: 38.34961, y: -81.875}
+        - {x: 39.34961, y: -82.875}
+        - {x: 68.34961, y: -82.875}
+        - {x: 76.34961, y: -77.875}
+        - {x: 76.34961, y: -30.875}
+        - {x: 54.34961, y: -24.875}
+    - name: splashBomb_20
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 54.322266, y: -27.875}
+        - {x: 40.322266, y: -30.875}
+        - {x: 33.322266, y: -49.875}
+        - {x: 33.322266, y: -64.875}
+        - {x: 38.322266, y: -85.875}
+        - {x: 68.322266, y: -85.875}
+        - {x: 80.322266, y: -70.875}
+        - {x: 80.322266, y: -49.875}
+        - {x: 73.322266, y: -27.875}
+    - name: splashBomb_21
+      rect:
+        serializedVersion: 2
+        x: 1267
+        y: 384
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 35.29492, y: -22.875}
+        - {x: 30.294922, y: -42.875}
+        - {x: 30.294922, y: -73.875}
+        - {x: 42.29492, y: -91.875}
+        - {x: 44.29492, y: -92.875}
+        - {x: 74.29492, y: -92.875}
+        - {x: 84.29492, y: -90.875}
+        - {x: 84.29492, y: -22.875}
+    - name: splashBomb_22
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 14.986328, y: -19.625}
+        - {x: 14.986328, y: -103.625}
+        - {x: 19.986328, y: -110.625}
+        - {x: 81.98633, y: -110.625}
+        - {x: 96.98633, y: -105.625}
+        - {x: 96.98633, y: -23.625}
+        - {x: 90.98633, y: -19.625}
+    - name: splashBomb_23
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 40.458984, y: -19.625}
+        - {x: 26.458984, y: -24.625}
+        - {x: 26.458984, y: -78.625}
+        - {x: 39.458984, y: -97.625}
+        - {x: 72.458984, y: -97.625}
+        - {x: 88.458984, y: -76.625}
+        - {x: 88.458984, y: -34.625}
+        - {x: 80.458984, y: -19.625}
+    - name: splashBomb_24
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 48.43164, y: -31.625}
+        - {x: 36.43164, y: -43.625}
+        - {x: 36.43164, y: -66.625}
+        - {x: 38.43164, y: -82.625}
+        - {x: 45.43164, y: -85.625}
+        - {x: 72.43164, y: -85.625}
+        - {x: 77.43164, y: -83.625}
+        - {x: 77.43164, y: -41.625}
+        - {x: 66.43164, y: -31.625}
+    - name: splashBomb_25
+      rect:
+        serializedVersion: 2
+        x: 543
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 68.4043, y: -35.625}
+        - {x: 34.404297, y: -35.625}
+        - {x: 33.404297, y: -44.625}
+        - {x: 33.404297, y: -75.625}
+        - {x: 37.404297, y: -78.625}
+        - {x: 72.4043, y: -78.625}
+        - {x: 78.4043, y: -59.625}
+        - {x: 78.4043, y: -52.625}
+    - name: splashBomb_26
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 38.376953, y: -29.625}
+        - {x: 34.376953, y: -31.625}
+        - {x: 34.376953, y: -78.625}
+        - {x: 45.376953, y: -84.625}
+        - {x: 66.37695, y: -84.625}
+        - {x: 75.37695, y: -81.625}
+        - {x: 75.37695, y: -41.625}
+        - {x: 63.376953, y: -29.625}
+    - name: splashBomb_27
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 56.34961, y: -82.625}
+        - {x: 54.34961, y: -84.625}
+        - {x: 54.34961, y: -86.625}
+        - {x: 57.34961, y: -89.625}
+        - {x: 58.34961, y: -89.625}
+        - {x: 61.34961, y: -86.625}
+        - {x: 61.34961, y: -84.625}
+        - {x: 59.34961, y: -82.625}
+      - - {x: 42.34961, y: -24.625}
+        - {x: 38.34961, y: -43.625}
+        - {x: 38.34961, y: -81.625}
+        - {x: 68.34961, y: -81.625}
+        - {x: 76.34961, y: -74.625}
+        - {x: 76.34961, y: -28.625}
+        - {x: 60.34961, y: -24.625}
+    - name: splashBomb_28
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 42.322266, y: -27.625}
+        - {x: 33.322266, y: -46.625}
+        - {x: 33.322266, y: -77.625}
+        - {x: 36.322266, y: -85.625}
+        - {x: 75.322266, y: -85.625}
+        - {x: 80.322266, y: -69.625}
+        - {x: 80.322266, y: -34.625}
+        - {x: 78.322266, y: -27.625}
+    - name: splashBomb_29
+      rect:
+        serializedVersion: 2
+        x: 1267
+        y: 192
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 70.29492, y: -22.625}
+        - {x: 43.29492, y: -22.625}
+        - {x: 30.294922, y: -39.625}
+        - {x: 30.294922, y: -71.625}
+        - {x: 32.29492, y: -79.625}
+        - {x: 39.29492, y: -91.625}
+        - {x: 74.29492, y: -91.625}
+        - {x: 80.29492, y: -80.625}
+        - {x: 84.29492, y: -71.625}
+        - {x: 84.29492, y: -38.625}
+    - name: splashBomb_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 40.98633, y: -68.875}
+        - {x: 49.98633, y: -80.875}
+        - {x: 66.98633, y: -80.875}
+        - {x: 73.98633, y: -77.875}
+        - {x: 73.98633, y: -49.875}
+        - {x: 72.98633, y: -43.875}
+        - {x: 60.98633, y: -37.875}
+        - {x: 50.98633, y: -37.875}
+        - {x: 40.98633, y: -41.875}
+    - name: splashBomb_31
+      rect:
+        serializedVersion: 2
+        x: 181
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 59.458984, y: -78.875}
+        - {x: 57.458984, y: -80.875}
+        - {x: 57.458984, y: -82.875}
+        - {x: 59.458984, y: -84.875}
+        - {x: 61.458984, y: -84.875}
+        - {x: 63.458984, y: -82.875}
+        - {x: 63.458984, y: -80.875}
+        - {x: 61.458984, y: -78.875}
+      - - {x: 71.458984, y: -42.875}
+        - {x: 65.458984, y: -39.875}
+        - {x: 46.458984, y: -39.875}
+        - {x: 42.458984, y: -45.875}
+        - {x: 42.458984, y: -77.875}
+        - {x: 61.458984, y: -77.875}
+        - {x: 63.458984, y: -76.875}
+        - {x: 71.458984, y: -65.875}
+    - name: splashBomb_32
+      rect:
+        serializedVersion: 2
+        x: 362
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 45.43164, y: -75.875}
+        - {x: 43.43164, y: -77.875}
+        - {x: 43.43164, y: -79.875}
+        - {x: 45.43164, y: -81.875}
+        - {x: 47.43164, y: -81.875}
+        - {x: 49.43164, y: -79.875}
+        - {x: 49.43164, y: -77.875}
+        - {x: 47.43164, y: -75.875}
+      - - {x: 64.43164, y: -37.875}
+        - {x: 47.43164, y: -37.875}
+        - {x: 43.43164, y: -42.875}
+        - {x: 42.43164, y: -44.875}
+        - {x: 42.43164, y: -71.875}
+        - {x: 50.43164, y: -77.875}
+        - {x: 66.43164, y: -77.875}
+        - {x: 73.43164, y: -67.875}
+        - {x: 75.43164, y: -57.875}
+        - {x: 75.43164, y: -43.875}
+      - - {x: 39.43164, y: -62.875}
+        - {x: 42.43164, y: -61.875}
+        - {x: 42.43164, y: -58.875}
+        - {x: 39.43164, y: -57.875}
+        - {x: 37.43164, y: -59.875}
+    - name: splashBomb_33
+      rect:
+        serializedVersion: 2
+        x: 543
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 47.404297, y: -36.875}
+        - {x: 40.404297, y: -39.875}
+        - {x: 40.404297, y: -70.875}
+        - {x: 45.404297, y: -78.875}
+        - {x: 65.4043, y: -78.875}
+        - {x: 73.4043, y: -72.875}
+        - {x: 73.4043, y: -43.875}
+        - {x: 70.4043, y: -36.875}
+    - name: splashBomb_34
+      rect:
+        serializedVersion: 2
+        x: 724
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 56.376953, y: -84.875}
+        - {x: 59.376953, y: -83.875}
+        - {x: 59.376953, y: -80.875}
+        - {x: 56.376953, y: -79.875}
+        - {x: 54.376953, y: -81.875}
+      - - {x: 46.376953, y: -34.875}
+        - {x: 39.376953, y: -37.875}
+        - {x: 39.376953, y: -72.875}
+        - {x: 41.376953, y: -79.875}
+        - {x: 70.37695, y: -79.875}
+        - {x: 75.37695, y: -70.875}
+        - {x: 75.37695, y: -42.875}
+        - {x: 68.37695, y: -34.875}
+    - name: splashBomb_35
+      rect:
+        serializedVersion: 2
+        x: 905
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 47.34961, y: -32.875}
+        - {x: 38.34961, y: -41.875}
+        - {x: 38.34961, y: -73.875}
+        - {x: 49.34961, y: -81.875}
+        - {x: 67.34961, y: -81.875}
+        - {x: 76.34961, y: -76.875}
+        - {x: 76.34961, y: -44.875}
+        - {x: 71.34961, y: -32.875}
+    - name: splashBomb_36
+      rect:
+        serializedVersion: 2
+        x: 1086
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 46.322266, y: -31.875}
+        - {x: 37.322266, y: -35.875}
+        - {x: 37.322266, y: -74.875}
+        - {x: 43.322266, y: -83.875}
+        - {x: 67.322266, y: -83.875}
+        - {x: 76.322266, y: -81.875}
+        - {x: 77.322266, y: -79.875}
+        - {x: 77.322266, y: -45.875}
+        - {x: 72.322266, y: -31.875}
+    - name: splashBomb_37
+      rect:
+        serializedVersion: 2
+        x: 1267
+        y: 0
+        width: 181
+        height: 192
+      alignment: 1
+      pivot: {x: 0, y: 1}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline:
+      - - {x: 66.29492, y: -29.875}
+        - {x: 42.29492, y: -29.875}
+        - {x: 35.29492, y: -35.875}
+        - {x: 35.29492, y: -82.875}
+        - {x: 41.29492, y: -84.875}
+        - {x: 70.29492, y: -84.875}
+        - {x: 76.29492, y: -78.875}
+        - {x: 78.29492, y: -72.875}
+        - {x: 78.29492, y: -38.875}
+    outline: []
+  spritePackingTag: 
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

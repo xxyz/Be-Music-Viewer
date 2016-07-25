@@ -18,6 +18,11 @@ namespace BMSParser_new
             Encoding encoding = Encoding.GetEncoding(932);
             String line;
 
+            if (!File.Exists(path))
+            {
+                return null;
+            }
+
             using (FileStream fs = File.OpenRead(path))
             {
                 //detect charset
@@ -213,17 +218,34 @@ namespace BMSParser_new
                         //bga base
                         else if(channel == 4)
                         {
-                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.BGAEvent));
+                            bool isVideo = false;
+                            
+                            if (bms.bga.bga_header.Find(x => (int)x.id == id) != null)
+                            {
+                                isVideo = IsVideo(bms.bga.bga_header.Find(x => (int)x.id == id).name);
+                            }
+                            
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.BGAEvent, isVideo));
                         }
                         //bga poor
                         else if (channel == 6)
                         {
-                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.PoorEvent));
+                            bool isVideo = false;
+                            if (bms.bga.bga_header.Find(x => (int)x.id == id) != null)
+                            {
+                                isVideo = IsVideo(bms.bga.bga_header.Find(x => (int)x.id == id).name);
+                            }
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.PoorEvent, isVideo));
                         }
                         //bga layer
                         else if(channel == 7)
                         {
-                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.LayerEvent));
+                            bool isVideo = false;
+                            if (bms.bga.bga_header.Find(x => (int)x.id == id) != null)
+                            {
+                                isVideo = IsVideo(bms.bga.bga_header.Find(x => (int)x.id == id).name);
+                            }
+                            bms.bmsEvents.Add(new BGAEvent(id, measure, measureDiv, EventType.LayerEvent, isVideo));
                         }
                         //channel 08 => Find bpm from bpmHeader and add BpmEvent
                         else if (channel == 8)
@@ -241,13 +263,16 @@ namespace BMSParser_new
                         else
                         {
                             int bmsOnChannel = getBmsOnX(channel);
-                            bms.bmsEvents.Add(new NoteEvent(bmsOnChannel, 0, true, id, measure, measureDiv));
+                            bms.bmsEvents.Add(new NoteEvent(bmsOnChannel, 0, true, id, measure, measureDiv, channel));
                         }
                     }
                     argIndex++;
                 }
             }
         }
+
+
+        
 
         private void CalculatePulse(BMS bms)
         {
@@ -261,7 +286,8 @@ namespace BMSParser_new
             }
 
             bms.bmsEvents.Sort();
-            
+
+
             ulong[] accumYList = new ulong[bms.info.maxMeasure+10];
             double[] measureLengthList = Enumerable.Repeat((double)1, bms.info.maxMeasure + 1).ToArray();
 
@@ -286,30 +312,105 @@ namespace BMSParser_new
                 be.calcY(bms.info.resolution, measureLengthList[be.measure], accumYList[be.measure]);
             }
             bms.bmsEvents.Sort();
+
+            ProcessLn(bms);
+        }
+
+        private void ProcessLn(BMS bms)
+        {
+            int eventCount = bms.bmsEvents.Count();
+            for (int i = 0; i < eventCount; i++)
+            {
+                if (bms.bmsEvents[i].eventType == EventType.NoteEvent)
+                {
+                    NoteEvent ne = (NoteEvent)bms.bmsEvents[i];
+
+                    //green note
+                    if ((ne.channel >= 181 && ne.channel <= 189) || (ne.channel >= 217 && ne.channel <= 225))
+                    {
+                        int j = i + 1;
+                        //find end note
+                        while (j < eventCount - 1 && (bms.bmsEvents[j].eventType != EventType.NoteEvent ||
+                            ((NoteEvent)bms.bmsEvents[j]).x != ne.x))
+                        {
+                            j++;
+                        }
+
+                        if (j < eventCount)
+                        {
+                            ne.l = bms.bmsEvents[j].y - ne.y;
+                            bms.bmsEvents.RemoveAt(j);
+                            eventCount--;
+                        }
+                    }
+                    //lnobj
+                    else if ((int)ne.id == bms.info.lnObj)
+                    {
+                        int j = i - 1;
+
+                        while (j >= 0 && (bms.bmsEvents[j].eventType != EventType.NoteEvent ||
+                            ((NoteEvent)bms.bmsEvents[j]).x != ne.x))
+                        {
+                            j--;
+                        }
+                        if (j != -1)
+                        {
+                            ((NoteEvent)bms.bmsEvents[j]).l = ne.y - bms.bmsEvents[j].y;
+                            bms.bmsEvents.RemoveAt(i);
+                            eventCount--;
+                        }
+                    }
+                }
+            }
         }
 
         private int getBmsOnX(int channel)
         {
-            //1p scratch
+            //1p key
             if (channel == 42)
                 return 8;
-            //1p key 1~5
             else if (channel >= 37 && channel <= 41)
                 return channel - 36;
-            //1p key 6~7
             else if (channel >= 44 && channel <= 45)
                 return channel - 38;
-            //2p key 1~5
+            //2p key
             else if (channel >= 73 && channel <= 77)
                 return channel - 64;
             else if (channel >= 80 && channel <= 82)
                 return channel - 66;
             else if (channel == 78)
                 return 16;
+            //1p ln
+            else if (channel >= 181 && channel <= 185)
+                return channel - 180;
+            else if (channel >= 188 && channel <= 189)
+                return channel - 182;
+            else if (channel == 186)
+                return 8;
+            //2p ln
+            else if (channel >= 217 && channel <= 221)
+                return channel - 208;
+            else if (channel >= 224 && channel <= 225)
+                return channel - 210;
+            else if (channel == 222)
+                return 16;
+            //pms
+            else if (channel >= 74 && channel <= 77)
+                return channel - 68;
+
             return 0;
         }
         
         
+        public static bool IsVideo(string name)
+        {
+            string extension = Path.GetExtension(name);
+            if (extension == ".bmp" || extension == ".png" || extension == ".jpg")
+                return false;
+
+            return (extension == ".mpg" || extension == ".avi" || extension == ".mpeg" || extension == ".mp4");
+        }
+
         //split string by chunkSize
         public static IEnumerable<string> Split(string str, int chunkSize)
         {

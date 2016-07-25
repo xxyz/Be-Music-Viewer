@@ -25,7 +25,7 @@ namespace BMSParser_new
         //below field is not used in BMSON
         public int volwav = 100;
         public int difficulty;
-        public string back_bmp; //title picture(#backbmp)
+        public string back_bmp; //#backbmp
         public string comment;
 
         public List<BpmHeader> bpmHeaders = new List<BpmHeader>(new BpmHeader[1322]);
