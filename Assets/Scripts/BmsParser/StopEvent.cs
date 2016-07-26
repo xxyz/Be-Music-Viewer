@@ -3,12 +3,14 @@
     class StopEvent : BmsEvent
     {
         public ulong duration; // stop duration (pulse)
-
+        public double durationTime;
         public ulong id; // id for searching StopHeader
 
-        public StopEvent(ulong id, int measure, double measureDiv)
+
+
+        public StopEvent(ulong duration, int measure, double measureDiv)
         {
-            this.id = id;
+            this.duration = duration;
             this.measure = measure;
             this.measureDiv = measureDiv;
             eventType = EventType.StopEvent;

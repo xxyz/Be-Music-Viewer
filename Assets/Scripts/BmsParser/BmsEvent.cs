@@ -7,6 +7,7 @@ namespace BMSParser_new
     abstract class BmsEvent : IComparable<BmsEvent>
     {
         public ulong y;
+        public double time = 0;
         public int measure;
         public double measureDiv = 0;
         public EventType eventType;

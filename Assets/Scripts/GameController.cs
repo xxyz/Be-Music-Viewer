@@ -31,8 +31,10 @@ public class GameController : MonoBehaviour {
     public GameObject bgaLayerVideo;
 
     private GameObject judge;
+    public AudioMixerGroup masterMixer;
     public AudioMixerGroup keyMixer;
     public AudioMixerGroup backMixer;
+    public int[] randomLane = new int[] { 1, 2, 3, 4, 5, 6, 7 };
     public ulong pulseOffset = 0;
     public int highSpeed = 100;
 
@@ -55,7 +57,8 @@ public class GameController : MonoBehaviour {
     private ulong lastPulse;
     private int combo = 0;
 
-    private const float highSpeedConstant = 0.01f;
+    private double currBpm;
+    private float highSpeedConstant = 0.01f;
     private double pulseConstant;
     private int eventLength;
     private float worldScreenHeight;
@@ -72,6 +75,7 @@ public class GameController : MonoBehaviour {
 
     void Awake ()
     {
+        Time.timeScale = 0.0f;
         //set camera variables
         worldScreenHeight = Camera.main.orthographicSize * 2;
         worldScreenWidth = worldScreenHeight / Screen.height * Screen.width;
@@ -87,6 +91,8 @@ public class GameController : MonoBehaviour {
         {
             Debug.Log("Parsing Failed");
         }
+
+        currBpm = bms.info.init_bpm;
 
         //get components
         bgImage = bga.GetComponent<SpriteRenderer>();
@@ -135,7 +141,6 @@ public class GameController : MonoBehaviour {
         soundText = GameObject.Find("SoundCountText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
 
-
         soundObjects = new GameObject[maxSoundObjectId+10];
 
         //set Text
@@ -162,6 +167,9 @@ public class GameController : MonoBehaviour {
 
         //Check how many sounds are playing..
         InvokeRepeating("CurrentlyPlaying", 1f, 0.5f);
+
+        Time.timeScale = 1.0f;
+        
     }
     public void CurrentlyPlaying()
     {
@@ -181,14 +189,11 @@ public class GameController : MonoBehaviour {
 
         if (eventCounter >= eventLength)
             return;
-
-        if(bms.bmsEvents[eventCounter].y < pulse)
+        
+        while(eventCounter < eventLength && bms.bmsEvents[eventCounter].time < Time.time)
         {
-            while(eventCounter < eventLength && bms.bmsEvents[eventCounter].y < pulse)
-            {
-                    ExecuteBmsEvent(bms.bmsEvents[eventCounter]);
-                eventCounter++;
-            }
+            ExecuteBmsEvent(bms.bmsEvents[eventCounter]);
+            eventCounter++;
         }
 
         bmsTime += Time.deltaTime;
@@ -199,7 +204,8 @@ public class GameController : MonoBehaviour {
         pulseText.text = "Pulse: " + pulse + "/" + lastPulse;
         timeText.text = "Time: " + string.Format("{0:D2}:{1:D2}", timeSpan.Minutes, timeSpan.Seconds);
 
-        slider.transform.position = new Vector3(-2.33f, -2 - (float)(pulse * (highSpeed / pulseConstant)) * highSpeedConstant);
+        slider.transform.Translate(Vector3.down * Time.deltaTime * highSpeed * highSpeedConstant);
+        //slider.transform.position = new Vector3(-2.33f, -2 - Time.time * highSpeed * highSpeedConstant);
     }
 
     
@@ -216,8 +222,9 @@ public class GameController : MonoBehaviour {
                 bool drawFlag = true;
                 if(ne.x >= 1 && ne.x <= 7)
                 {
-                    xPos *= ne.x;
-                    if ((ne.x % 2) == 1)
+                    int lane = randomLane[ne.x-1];
+                    xPos *= lane;
+                    if ((lane % 2) == 1)
                         drawPrefab = noteWhite;
                     else
                     {
@@ -240,13 +247,13 @@ public class GameController : MonoBehaviour {
                 {
                     GameObject note = Instantiate(drawPrefab) as GameObject;
                     note.transform.SetParent(slider.transform);
-                    note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                    note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
                     //ln
                     if(ne.l > 0)
                     {
                         GameObject lnNote = Instantiate(drawLnPrefab) as GameObject;
                         lnNote.transform.SetParent(slider.transform);
-                        lnNote.transform.position = new Vector3(xPos - 2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                        lnNote.transform.position = new Vector3(xPos - 2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
                         lnNote.transform.localScale = new Vector3(1, (worldScreenHeight / 200 * 10000) * ne.l * (float)((highSpeed / pulseConstant)) * highSpeedConstant, 1);
                     }
                 }
@@ -255,7 +262,7 @@ public class GameController : MonoBehaviour {
             {
                 GameObject line = Instantiate(linePre) as GameObject;
                 line.transform.SetParent(slider.transform);
-                line.transform.position = new Vector3(-2.33f, (float)(be.y * (highSpeed / pulseConstant)) * highSpeedConstant, 0);
+                line.transform.position = new Vector3(-2.33f, (float)(be.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
             }
         }
     }
@@ -358,6 +365,8 @@ public class GameController : MonoBehaviour {
 
     void ExecuteBpmEvent(BpmEvent be)
     {
+        highSpeedConstant *= (float)(be.bpm / currBpm);
+        currBpm = be.bpm;
         pulseConstant = be.bpm * bms.info.resolution / (60 * 4);
         bpmText.text = "Bpm: " + be.bpm;
     }
@@ -400,7 +409,19 @@ public class GameController : MonoBehaviour {
     }
     void ExecuteStopEvent(StopEvent be)
     {
+        StartCoroutine(StopTime(be.durationTime));
+    }
 
+    IEnumerator StopTime(double time)
+    {
+        Time.timeScale = 0.0f;
+        float pauseEndTime = Time.realtimeSinceStartup + (float)time;
+        while (Time.realtimeSinceStartup < pauseEndTime)
+        {
+            yield return 0;
+        }
+
+        Time.timeScale = 1.0f;
     }
 
     IEnumerator ShowCombo(ulong length)

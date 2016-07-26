@@ -78,7 +78,6 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Assets\LoadBMS.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGA.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGAEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGAHeader.cs" />
@@ -102,6 +101,7 @@
     <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgeCapture.cs" />
     <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgePipeline.cs" />
     <Compile Include="Assets\Scripts\GstUnityBridge\GstUnityBridgeTexture.cs" />
+    <Compile Include="Assets\Scripts\LoadBMS.cs" />
     <Compile Include="Assets\Scripts\MixLevels.cs" />
     <Compile Include="Assets\Scripts\NotePlayer.cs" />
   </ItemGroup>

@@ -53,6 +53,7 @@ namespace BMSParser_new
             }
 
             CalculatePulse(bms);
+            FillRealTime(bms);
 
             return bms;
         }
@@ -262,17 +263,14 @@ namespace BMSParser_new
                         //note channel
                         else
                         {
-                            int bmsOnChannel = getBmsOnX(channel);
+                            int bmsOnChannel = GetBmsOnX(channel);
                             bms.bmsEvents.Add(new NoteEvent(bmsOnChannel, 0, true, id, measure, measureDiv, channel));
                         }
                     }
                     argIndex++;
                 }
             }
-        }
-
-
-        
+        } 
 
         private void CalculatePulse(BMS bms)
         {
@@ -364,7 +362,7 @@ namespace BMSParser_new
             }
         }
 
-        private int getBmsOnX(int channel)
+        private int GetBmsOnX(int channel)
         {
             //1p key
             if (channel == 42)
@@ -401,6 +399,36 @@ namespace BMSParser_new
             return 0;
         }
         
+        private void FillRealTime(BMS bms)
+        {
+            double currTime = 0;
+            ulong currPulse = 0;
+            ulong deltaPulse = 0;
+            double currBpm = bms.info.init_bpm;
+            ulong resolution = bms.info.resolution;
+            double pulseConst = 4 * 60 / (currBpm * resolution);
+            BmsEvent currEvent;
+
+            for (int i = 0; i < bms.bmsEvents.Count; i++)
+            {
+                currEvent = bms.bmsEvents[i];
+                deltaPulse = currEvent.y - currPulse;
+                currPulse = currEvent.y;
+
+                currTime += pulseConst * deltaPulse;
+                currEvent.time = currTime;
+
+                if(currEvent.eventType == EventType.BpmEvent)
+                {
+                    currBpm = ((BpmEvent)currEvent).bpm;
+                    pulseConst = 4 * 60 / (currBpm * resolution);
+                }
+                else if(currEvent.eventType == EventType.StopEvent)
+                {
+                    ((StopEvent)currEvent).durationTime = pulseConst * ((StopEvent)currEvent).duration;
+                }
+            }
+        }
         
         public static bool IsVideo(string name)
         {
