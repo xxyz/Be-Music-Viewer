@@ -11,17 +11,17 @@ using UnityEngine.Audio;
 public class GameController : MonoBehaviour {
 
     public string BmsPath;
+
+    //Drawing prefabs
     public UnityEngine.Font[] judgeFonts;
     public Sprite[] judgeSprites;
     public GameObject soundchannelpre;
-
     public GameObject noteScratch;
     public GameObject noteWhite;
     public GameObject noteBlue;
     public GameObject noteWhiteLn;
     public GameObject noteBlueLn;
     public GameObject noteScratchLn;
-
     public GameObject linePre;
     public GameObject slider;
 
@@ -29,14 +29,14 @@ public class GameController : MonoBehaviour {
     public GameObject bgaLayer;
     public GameObject bgaVideo;
     public GameObject bgaLayerVideo;
+    public GameObject graphPanel;
 
     private GameObject judge;
     public AudioMixerGroup masterMixer;
     public AudioMixerGroup keyMixer;
     public AudioMixerGroup backMixer;
     public int[] randomLane = new int[] { 1, 2, 3, 4, 5, 6, 7 };
-    public ulong pulseOffset = 0;
-    public int highSpeed = 100;
+    public int highSpeed = 300;
 
 
     private BMS bms;
@@ -63,9 +63,10 @@ public class GameController : MonoBehaviour {
     private int eventLength;
     private float worldScreenHeight;
     private float worldScreenWidth;
-
-    private Text titleText, subtitleText, artistText, bpmText, bgaText, soundText, 
-        layerText, pulseText, genreText, timeText, measureText, totalText, resolutionText, comboText;
+    private Text 
+        titleText, subtitleText, artistText, bpmText, bgaText, soundText, 
+        layerText, pulseText, genreText, timeText, measureText, totalText,
+        resolutionText, comboText;
     private UnityEngine.UI.Image judgeImage;
 
     private AudioSource[] audioSources;
@@ -168,6 +169,8 @@ public class GameController : MonoBehaviour {
         //Check how many sounds are playing..
         InvokeRepeating("CurrentlyPlaying", 1f, 0.5f);
 
+        graphPanel.GetComponent<DrawBMSGraph>().DrawGraph(bms.bmsEvents);
+
         Time.timeScale = 1.0f;
         
     }
@@ -220,7 +223,7 @@ public class GameController : MonoBehaviour {
                 GameObject drawLnPrefab = noteWhiteLn;
                 float xPos = 0.16f;
                 bool drawFlag = true;
-                if(ne.x >= 1 && ne.x <= 7)
+                if(BMSUtil.GetNoteType(ne.x) == NoteType.Key1p)
                 {
                     int lane = randomLane[ne.x-1];
                     xPos *= lane;
@@ -233,7 +236,7 @@ public class GameController : MonoBehaviour {
                     }
                         
                 }
-                else if(ne.x == 8)
+                else if(BMSUtil.GetNoteType(ne.x) == NoteType.Scratch1p)
                 {
                     drawPrefab = noteScratch;
                     drawLnPrefab = noteScratchLn;
@@ -247,13 +250,13 @@ public class GameController : MonoBehaviour {
                 {
                     GameObject note = Instantiate(drawPrefab) as GameObject;
                     note.transform.SetParent(slider.transform);
-                    note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
+                    note.transform.position = new Vector3(xPos-2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.95f, 0);
                     //ln
                     if(ne.l > 0)
                     {
                         GameObject lnNote = Instantiate(drawLnPrefab) as GameObject;
                         lnNote.transform.SetParent(slider.transform);
-                        lnNote.transform.position = new Vector3(xPos - 2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
+                        lnNote.transform.position = new Vector3(xPos - 2.33f, (float)(ne.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.95f, 0);
                         lnNote.transform.localScale = new Vector3(1, (worldScreenHeight / 200 * 10000) * ne.l * (float)((highSpeed / pulseConstant)) * highSpeedConstant, 1);
                     }
                 }
@@ -262,7 +265,7 @@ public class GameController : MonoBehaviour {
             {
                 GameObject line = Instantiate(linePre) as GameObject;
                 line.transform.SetParent(slider.transform);
-                line.transform.position = new Vector3(-2.33f, (float)(be.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.9f, 0);
+                line.transform.position = new Vector3(-2.33f, (float)(be.y * (highSpeed / pulseConstant)) * highSpeedConstant - 0.95f, 0);
             }
         }
     }
@@ -500,8 +503,6 @@ public class GameController : MonoBehaviour {
         Texture2D bgaTexture;
         foreach (BGAHeader bh in bms.bga.bga_header)
         {
-            
-
             string path = bms.path + "\\" + bh.name;
 
 
@@ -509,7 +510,6 @@ public class GameController : MonoBehaviour {
             {
                 return;
             }
-
 
             if (!File.Exists(path))
                 path = Path.ChangeExtension(path, ".png");
@@ -546,26 +546,27 @@ public class GameController : MonoBehaviour {
 
                 if (File.Exists(path))
                 {
-                    soundObjects[sc.id] = Instantiate(soundchannelpre) as GameObject;
-                    soundObjects[sc.id].name = sc.name;
-                    soundObjects[sc.id].transform.SetParent(soundTrans);
-
-                    WWW www = new WWW("file:///" + path.Replace("#", "%23"));
-
-                    AudioClip clip = www.GetAudioClip(false, false);
-                    /*
-                    while (!www.isDone)
-                    {
-                        Debug.Log("not Done "+ sc.name);
-                        yield return null;
-                    }
-                    */
-                    clip.name = Path.GetFileName(path);
-
-                    soundObjects[sc.id].GetComponent<AudioSource>().clip = clip;
+                    StartCoroutine(WWWSoundLoad(path, sc, soundTrans));
                 }
             }
         }
+    }
 
+    IEnumerator WWWSoundLoad(string path, SoundHeader sc, Transform soundTrans)
+    {
+        soundObjects[sc.id] = Instantiate(soundchannelpre) as GameObject;
+        soundObjects[sc.id].name = sc.name;
+        soundObjects[sc.id].transform.SetParent(soundTrans);
+
+        WWW www = new WWW("file:///" + path.Replace("#", "%23"));
+
+        AudioClip clip = www.GetAudioClip(false, false);
+        while (!www.isDone)
+        {
+            yield return null;
+        }
+        clip.name = Path.GetFileName(path);
+
+        soundObjects[sc.id].GetComponent<AudioSource>().clip = clip;
     }
 }

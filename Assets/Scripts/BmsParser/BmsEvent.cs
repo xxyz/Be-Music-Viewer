@@ -2,9 +2,9 @@
 
 namespace BMSParser_new
 {
-    enum EventType { LineEvent, NoteEvent, BGAEvent, LayerEvent, PoorEvent, BpmEvent, StopEvent };
+    public enum EventType { LineEvent, NoteEvent, BGAEvent, LayerEvent, PoorEvent, BpmEvent, StopEvent };
 
-    abstract class BmsEvent : IComparable<BmsEvent>
+    public abstract class BmsEvent : IComparable<BmsEvent>
     {
         public ulong y;
         public double time = 0;

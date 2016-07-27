@@ -78,12 +78,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\DrawBMSGraph.cs" />
+    <Compile Include="Assets\GraphBarTooltip.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGA.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGAEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BGAHeader.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BMS.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BMSInfo.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BMSParser.cs" />
+    <Compile Include="Assets\Scripts\BmsParser\BMSUtil.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BarLine.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BmsEvent.cs" />
     <Compile Include="Assets\Scripts\BmsParser\BpmEvent.cs" />
