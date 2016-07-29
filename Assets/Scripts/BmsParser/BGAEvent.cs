@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class BGAEvent : BmsEvent
+    public class BGAEvent : BmsEvent
     {
         public ulong id;
         public bool isVideo;

@@ -38,6 +38,7 @@ public class GraphBarTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
         noteText.text = "Notes: " + notes;
         timeText.text = "Length: " + Math.Round(time, 2) + "s";
         densityText.text = "Density: " + Math.Round(density, 2) + "notes/s";
+        scText.text = "Scratch: " + scratch;
         tooltipPanel.SetActive(true);
     }
 

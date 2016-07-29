@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BMSParser_new
+namespace BMSParser
 {
-    class SoundChannel
+    public class SoundChannel
     {
         public string name; //sound file's name
         public List<Note> notes = new List<Note>();

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BMSParser_new
+namespace BMSParser
 {
-    class BGA
+    public class BGA
     {
         public List<BGAHeader> bga_header = new List<BGAHeader>(); //pictures' id and filename
         public List<BGAEvent> bga_events = new List<BGAEvent>(); // pictures' sequence

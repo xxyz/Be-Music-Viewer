@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
-using BMSParser_new;
+using BMSParser;
 using System.Collections.Generic;
 
 public class NotePlayer : MonoBehaviour {

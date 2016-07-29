@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class BpmHeader
+    public class BpmHeader
     {
         public int id; //id of file
         public double bpm;

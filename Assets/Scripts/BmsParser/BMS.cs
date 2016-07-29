@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace BMSParser_new
+namespace BMSParser
 {
-    class BMS
+    public class BMS
     {
         public string version; //bmson version
         public string path; //BMS absolute path

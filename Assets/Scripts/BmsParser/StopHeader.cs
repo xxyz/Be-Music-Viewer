@@ -1,4 +1,4 @@
-﻿class StopHeader
+﻿public class StopHeader
 {
     public ulong id; //id of file
     public ulong duration;

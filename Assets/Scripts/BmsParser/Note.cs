@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace BMSParser_new
+namespace BMSParser
 {
-    class Note
+    public class Note
     {
         public int x; //lane number(1~7: note, 8: scratch...)
         public ulong y; //pulse number

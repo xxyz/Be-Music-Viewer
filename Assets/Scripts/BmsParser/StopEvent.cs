@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class StopEvent : BmsEvent
+    public class StopEvent : BmsEvent
     {
         public ulong duration; // stop duration (pulse)
         public double durationTime;

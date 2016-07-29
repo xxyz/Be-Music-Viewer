@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class BGAHeader
+    public class BGAHeader
     {
         public ulong id; //id of file
         public string name; //picture file name

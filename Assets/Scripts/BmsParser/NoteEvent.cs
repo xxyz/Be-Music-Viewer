@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class NoteEvent : BmsEvent
+    public class NoteEvent : BmsEvent
     {
         public int x; //lane
         public ulong l = 0; //length

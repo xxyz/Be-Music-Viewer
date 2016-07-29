@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace BMSParser_new
+namespace BMSParser
 {
     class BMSParser
     {
@@ -51,7 +51,7 @@ namespace BMSParser_new
                     ProcessBMSLine(line.Trim(), bms);
                 }
             }
-
+            SetSubtitle(bms.info);
             CalculatePulse(bms);
             FillRealTime(bms);
 
@@ -72,12 +72,12 @@ namespace BMSParser_new
             {
                 if (args[0].StartsWith("#WAV")) //add soundchannel, note information will be added later.
                 {
-                    int id = HexToInt(args[0].Substring(4, 2));
+                    int id = BMSUtil.HexToInt(args[0].Substring(4, 2));
                     bms.info.soundHeaders.Add( new SoundHeader(id, args[1]) );
                 }
                 else if (args[0].StartsWith("#BMP"))
                 {
-                    int id = HexToInt(args[0].Substring(4, 2));
+                    int id = BMSUtil.HexToInt(args[0].Substring(4, 2));
                     bms.bga.bga_header.Add(new BGAHeader(id, args[1]));
                 }
                 else if (args[0] == "#BPM") //init bpm
@@ -86,12 +86,12 @@ namespace BMSParser_new
                 }
                 else if (args[0].StartsWith("#BPM")) //bpm changing events, add to bpmHeader
                 {
-                    int id = HexToInt(args[0].Substring(4, 2));
+                    int id = BMSUtil.HexToInt(args[0].Substring(4, 2));
                     bms.info.bpmHeaders[id] =  new BpmHeader(id, Convert.ToDouble(args[1]));
                 }
                 else if (args[0].StartsWith("#STOP")) //Stop events
                 {
-                    int id = HexToInt(args[0].Substring(5, 2));
+                    int id = BMSUtil.HexToInt(args[0].Substring(5, 2));
                     bms.info.stopHeaders[id] = new StopHeader(id, Convert.ToUInt64(args[1]));
                 }
                 else if (args[0] == "#TITLE")
@@ -161,7 +161,7 @@ namespace BMSParser_new
                 }
                 else if (args[0] == "#LNOBJ")
                 {
-                    bms.info.lnObj = HexToInt(args[1]);
+                    bms.info.lnObj = BMSUtil.HexToInt(args[1]);
                 }
                 else if (args[0] == "#LNTYPE")
                 {
@@ -184,7 +184,7 @@ namespace BMSParser_new
                     return;
                 //TODO if 192 % args.count != 0 change resolution
                 int measure = Convert.ToInt32(args[0].Substring(1, 3));
-                int channel = HexToInt(args[0].Substring(4, 2));
+                int channel = BMSUtil.HexToInt(args[0].Substring(4, 2));
 
                 if (bms.info.maxMeasure < measure)
                     bms.info.maxMeasure = measure;
@@ -197,7 +197,7 @@ namespace BMSParser_new
                     return;
                 }
 
-                IEnumerable<string> notes = Split(args[1], 2);
+                IEnumerable<string> notes = BMSUtil.Split(args[1], 2);
                 IEnumerator<string> noteEnum = notes.GetEnumerator();
                 int argsLength = notes.Count<string>();
                 int argIndex = 0;
@@ -208,7 +208,7 @@ namespace BMSParser_new
                     if(noteEnum.Current!= "00")
                     {
                         measureDiv = (double)argIndex / argsLength;
-                        int id = HexToInt(noteEnum.Current);
+                        int id = BMSUtil.HexToInt(noteEnum.Current);
 
                         if (channel == 3)
                         {
@@ -356,10 +356,43 @@ namespace BMSParser_new
                             ((NoteEvent)bms.bmsEvents[j]).l = ne.y - bms.bmsEvents[j].y;
                             bms.bmsEvents.RemoveAt(i);
                             eventCount--;
+                            i--;
                         }
                     }
                 }
             }
+        }
+
+        private void SetSubtitle(BMSInfo bmsInfo)
+        {
+            if (!string.IsNullOrEmpty(bmsInfo.subtitle))
+                return;
+
+            char openBraket;
+
+            if((openBraket = GetOpenBracket(bmsInfo.title[bmsInfo.title.Length-1])) != '0')
+            {
+                int openBraketPos = bmsInfo.title.Substring(0, bmsInfo.title.Length - 1).LastIndexOf(openBraket);
+                if(openBraketPos != -1)
+                {
+                    bmsInfo.subtitle = bmsInfo.title.Substring(openBraketPos);
+                    bmsInfo.title = bmsInfo.title.Substring(0, openBraketPos);
+                }
+            }
+        }
+
+        private char GetOpenBracket(char input)
+        {
+            if (input == ']')
+                return '[';
+            else if (input == ')')
+                return '(';
+            else if (input == '}')
+                return '{';
+            else if (input == '~' || input == '-')
+                return input;
+
+            return '0';
         }
 
         private int GetBmsOnX(int channel)
@@ -439,30 +472,5 @@ namespace BMSParser_new
             return (extension == ".mpg" || extension == ".avi" || extension == ".mpeg" || extension == ".mp4");
         }
 
-        //split string by chunkSize
-        public static IEnumerable<string> Split(string str, int chunkSize)
-        {
-            return Enumerable.Range(0, str.Length / chunkSize)
-                .Select(i => str.Substring(i * chunkSize, chunkSize));
-        }
-        //Hexadecimal to Int
-        public static int HexToInt(string hex)
-        {
-            String sample = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-            int result = 0;
-            for (int i = 0; i < hex.Length; i++)
-            {
-                result *= 36;
-                for (int j = 0; j < sample.Length; j++)
-                {
-                    if (hex[i] == sample[j])
-                    {
-                        result += j;
-                    }
-                }
-            }
-
-            return result;
-        }
     }
 }

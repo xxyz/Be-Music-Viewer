@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class LineEvent : BmsEvent
+    public class LineEvent : BmsEvent
     {
         public ulong accumY = 0;
         public double measureLength = 1;

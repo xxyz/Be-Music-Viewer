@@ -1,6 +1,6 @@
-﻿namespace BMSParser_new
+﻿namespace BMSParser
 {
-    class SoundHeader
+    public class SoundHeader
     {
         public ulong id;
         public string name;

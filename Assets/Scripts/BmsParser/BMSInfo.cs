@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 
-namespace BMSParser_new
+namespace BMSParser
 {
     //BMS header information
-    class BMSInfo
+    public class BMSInfo
     {
         public string title;
         public string subtitle = "";

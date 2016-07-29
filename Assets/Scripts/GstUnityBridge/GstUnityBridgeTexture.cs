@@ -277,7 +277,7 @@ public class GstUnityBridgeTexture : MonoBehaviour
         {
             Initialize();
             Setup(m_URI, m_VideoIndex, m_AudioIndex);
-            Play();
+            //Play();
         }
     }
 

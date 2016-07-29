@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BMSParser_new
+namespace BMSParser
 {
     public enum EventType { LineEvent, NoteEvent, BGAEvent, LayerEvent, PoorEvent, BpmEvent, StopEvent };
 
