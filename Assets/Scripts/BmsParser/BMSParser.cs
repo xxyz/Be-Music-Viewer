@@ -121,7 +121,8 @@ namespace BMSParser
                 }
                 else if (args[0] == "#PLAYLEVEL")
                 {
-                    bms.info.level = Convert.ToUInt64(args[1]);
+                    if (!ulong.TryParse(args[1], out bms.info.level))
+                        bms.info.level = 0;                    
                 }
                 else if (args[0] == "#RANK")
                 {
@@ -262,10 +263,7 @@ namespace BMSParser
                         }
                         //note channel
                         else
-                        {
-                            int bmsOnChannel = GetBmsOnX(channel);
-                            bms.bmsEvents.Add(new NoteEvent(bmsOnChannel, 0, true, id, measure, measureDiv, channel));
-                        }
+                            bms.bmsEvents.Add(new NoteEvent(true, id, measure, measureDiv, channel));
                     }
                     argIndex++;
                 }
@@ -395,43 +393,10 @@ namespace BMSParser
             return '0';
         }
 
-        private int GetBmsOnX(int channel)
-        {
-            //1p key
-            if (channel == 42)
-                return 8;
-            else if (channel >= 37 && channel <= 41)
-                return channel - 36;
-            else if (channel >= 44 && channel <= 45)
-                return channel - 38;
-            //2p key
-            else if (channel >= 73 && channel <= 77)
-                return channel - 64;
-            else if (channel >= 80 && channel <= 82)
-                return channel - 66;
-            else if (channel == 78)
-                return 16;
-            //1p ln
-            else if (channel >= 181 && channel <= 185)
-                return channel - 180;
-            else if (channel >= 188 && channel <= 189)
-                return channel - 182;
-            else if (channel == 186)
-                return 8;
-            //2p ln
-            else if (channel >= 217 && channel <= 221)
-                return channel - 208;
-            else if (channel >= 224 && channel <= 225)
-                return channel - 210;
-            else if (channel == 222)
-                return 16;
-            //pms
-            else if (channel >= 74 && channel <= 77)
-                return channel - 68;
-
-            return 0;
-        }
         
+        
+        
+
         private void FillRealTime(BMS bms)
         {
             double currTime = 0;

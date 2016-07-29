@@ -20,6 +20,7 @@ public class GameController : MonoBehaviour {
     public GameObject noteWhiteLn;
     public GameObject noteBlueLn;
     public GameObject noteScratchLn;
+    public GameObject noteMine;
     public GameObject linePre;
     public GameObject slider;
 
@@ -140,7 +141,7 @@ public class GameController : MonoBehaviour {
         soundText = GameObject.Find("SoundCountText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
 
-        soundObjects = new GameObject[maxSoundObjectId+10];
+        soundObjects = new GameObject[1296];
 
         //set Text
         titleText.text = "Title: " + bms.info.title;
@@ -235,12 +236,19 @@ public class GameController : MonoBehaviour {
                 {
                     int lane = randomLane[ne.x-1];
                     xPos *= lane;
-                    if ((lane % 2) == 1)
-                        drawPrefab = noteWhite;
-                    else
+                    if (ne.noteEventType == NoteEventType.plain)
                     {
-                        drawPrefab = noteBlue;
-                        drawLnPrefab = noteBlueLn;
+                        if ((lane % 2) == 1)
+                            drawPrefab = noteWhite;
+                        else
+                        {
+                            drawPrefab = noteBlue;
+                            drawLnPrefab = noteBlueLn;
+                        }
+                    }
+                    else if(ne.noteEventType == NoteEventType.mine)
+                    {
+                        drawPrefab = noteMine;
                     }
                         
                 }
@@ -390,6 +398,9 @@ public class GameController : MonoBehaviour {
 
     void ExecuteNoteEvent(NoteEvent be)
     {
+        if (be.noteEventType == NoteEventType.mine || be.noteEventType == NoteEventType.invisible)
+            return;
+
         try
         {
             AudioSource audioSource = soundObjects[be.id].GetComponent<AudioSource>();
