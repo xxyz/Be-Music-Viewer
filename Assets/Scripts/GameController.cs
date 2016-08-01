@@ -7,7 +7,11 @@ using System;
 using UnityEngine.Audio;
 using BMSParser;
 
+public enum LnComboType { LR2, IIDX, ruvit }
+
 public class GameController : MonoBehaviour {
+
+    public LnComboType lnComboType = LnComboType.LR2;
 
     //Drawing prefabs
     public UnityEngine.Font[] judgeFonts;
@@ -17,6 +21,9 @@ public class GameController : MonoBehaviour {
     public GameObject noteScratch;
     public GameObject noteWhite;
     public GameObject noteBlue;
+    public GameObject noteScartchInvisible;
+    public GameObject noteWhiteInvisible;
+    public GameObject noteBlueInvisible;
     public GameObject noteWhiteLn;
     public GameObject noteBlueLn;
     public GameObject noteScratchLn;
@@ -57,6 +64,7 @@ public class GameController : MonoBehaviour {
     private uint measure = 0;
     private ulong lastPulse;
     private int combo = 0;
+    private ulong resolution;
 
     private double currBpm;
     private float highSpeedConstant = 0.01f;
@@ -67,7 +75,7 @@ public class GameController : MonoBehaviour {
     private Text 
         titleText, subtitleText, artistText, bpmText, bgaText, soundText, 
         layerText, pulseText, genreText, timeText, measureText, totalText,
-        resolutionText, comboText;
+        resolutionText, comboText, loadingStatusText;
     private UnityEngine.UI.Image judgeImage;
 
     private AudioSource[] audioSources;
@@ -123,6 +131,7 @@ public class GameController : MonoBehaviour {
         
         pulseConstant = bms.info.init_bpm * bms.info.resolution / (60 * 4);
         lastPulse = bms.bmsEvents[bms.bmsEvents.Count - 1].y;
+        resolution = bms.info.resolution;
 
         judge = GameObject.Find("Judge");
         judgeImage = GameObject.Find("JudgeImage").GetComponent<UnityEngine.UI.Image>();
@@ -140,6 +149,7 @@ public class GameController : MonoBehaviour {
         resolutionText = GameObject.Find("ResolutionText").GetComponent<Text>();
         soundText = GameObject.Find("SoundCountText").GetComponent<Text>();
         comboText = GameObject.Find("ComboText").GetComponent<Text>();
+        loadingStatusText = GameObject.Find("LoadingStatusText").GetComponent<Text>();
 
         soundObjects = new GameObject[1296];
 
@@ -152,11 +162,18 @@ public class GameController : MonoBehaviour {
         totalText.text = "Total: " + bms.info.total;
         measureText.text = "Measure: 0/" + bms.info.maxMeasure;
         resolutionText.text = "Resolution: " + bms.info.resolution;
-        
 
+
+        loadingStatusText.text = "Loading BGA...";
+        yield return null;
         LoadBga();
 
+        loadingStatusText.text = "Loading Sound...";
+        yield return null;
         LoadSound(bms.info.soundHeaders);
+
+        loadingStatusText.text = "Drawing Notes...";
+        yield return null;
         NotePlacement();
 
         
@@ -169,6 +186,8 @@ public class GameController : MonoBehaviour {
 
         DrawBMSGraph dbg = graphPanel.GetComponent<DrawBMSGraph>();
         dbg.DrawGraph(bms.bmsEvents);
+        loadingStatusText.text = "Done";
+        yield return null;
 
         loadingScreen.SetActive(false);
         isLoaded = true;
@@ -196,8 +215,8 @@ public class GameController : MonoBehaviour {
 
         while (!isLoaded)
             return;
-        
-        while(eventCounter < eventLength && bms.bmsEvents[eventCounter].time < Time.time - timeOffset)
+
+        while (eventCounter < eventLength && bms.bmsEvents[eventCounter].time < Time.time - timeOffset)
         {
             ExecuteBmsEvent(bms.bmsEvents[eventCounter]);
             eventCounter++;
@@ -227,12 +246,19 @@ public class GameController : MonoBehaviour {
         {
             if(be.eventType == BMSParser.EventType.NoteEvent)
             {
+
                 NoteEvent ne = (NoteEvent)be;
+
                 GameObject drawPrefab = noteWhite;
                 GameObject drawLnPrefab = noteWhiteLn;
                 float xPos = 0.16f;
                 bool drawFlag = true;
-                if(BMSUtil.GetNoteType(ne.x) == NoteType.Key1p)
+
+                if (ne.noteEventType == NoteEventType.invisible)
+                {
+                    drawFlag = false;
+                }
+                else if (BMSUtil.GetNoteType(ne.x) == NoteType.Key1p)
                 {
                     int lane = randomLane[ne.x-1];
                     xPos *= lane;
@@ -262,6 +288,7 @@ public class GameController : MonoBehaviour {
                 {
                     drawFlag = false;
                 }
+
                 if (drawFlag)
                 {
                     GameObject note = Instantiate(drawPrefab) as GameObject;
@@ -289,10 +316,7 @@ public class GameController : MonoBehaviour {
     void ExecuteBmsEvent(BmsEvent be)
     {
         if(be == null)
-        {
-            Debug.Log("Null BmsEvent");
             return;
-        }
 
         if (be.eventType == BMSParser.EventType.BGAEvent ||
             be.eventType == BMSParser.EventType.LayerEvent ||
@@ -398,36 +422,55 @@ public class GameController : MonoBehaviour {
 
     void ExecuteNoteEvent(NoteEvent be)
     {
+        //invisible notes & landmine notes
         if (be.noteEventType == NoteEventType.mine || be.noteEventType == NoteEventType.invisible)
             return;
 
-        try
+        
+
+        //none sound object
+        if (soundObjects[be.id] == null)
+        {
+            /*
+            if (bms.info.soundHeaders.Count <= (int)be.id || bms.info.soundHeaders[(int)be.id] == null)
+                Debug.Log("Audio File id(" + be.id + ") missing");
+            else
+                Debug.Log("Audio File '" + bms.info.soundHeaders[(int)be.id].name + "' missing");
+            */
+            StartCoroutine("AddCombo", be.l);
+        }
+        else
         {
             AudioSource audioSource = soundObjects[be.id].GetComponent<AudioSource>();
             AudioMixerGroup targetMixer = backMixer;
-
             if (audioSource.clip.loadState == AudioDataLoadState.Loaded)
             {
-                if(be.x != 0)
+                if (be.x != 0)
                 {
                     targetMixer = keyMixer;
-                    combo++;
-                    StopCoroutine("ShowCombo");
-                    StartCoroutine("ShowCombo", be.y);
+                    
                 }
                 audioSource.outputAudioMixerGroup = targetMixer;
                 audioSource.Play();
             }
             else
                 Debug.Log("AudioSource" + audioSource.clip.name + "Play Failed");
+
+            
         }
+
+        if (be.x != 0)
+            StartCoroutine(AddCombo(be.l));
+
+
+        /*}
         catch
         {
             if(bms.info.soundHeaders.Count <= (int)be.id || bms.info.soundHeaders[(int)be.id] == null)
                 Debug.Log("Audio File id(" + be.id + ") missing");
             else
                 Debug.Log("Audio File '" + bms.info.soundHeaders[(int)be.id].name + "' missing");
-        }
+        }*/
     }
     void ExecuteStopEvent(StopEvent be)
     {
@@ -446,9 +489,55 @@ public class GameController : MonoBehaviour {
         Time.timeScale = 1.0f;
     }
 
-    IEnumerator ShowCombo(ulong length)
+    IEnumerator AddCombo(ulong length)
     {
+        if (length == 0)
+        {
+            combo++;
+            StopCoroutine("ShowCombo");
+            StartCoroutine("ShowCombo");
+        }
+        //combo add when ln ends
+        else if(lnComboType == LnComboType.LR2)
+        {
+            yield return new WaitForSeconds((float)(length / pulseConstant));
+            combo++;
+            StopCoroutine("ShowCombo");
+            StartCoroutine("ShowCombo");
+        }
+        //combo add when ln starts and ends
+        else if(lnComboType == LnComboType.IIDX)
+        {
+            combo++;
+            StopCoroutine("ShowCombo");
+            StartCoroutine("ShowCombo");
 
+            yield return new WaitForSeconds((float)(length / pulseConstant));
+            combo++;
+            StopCoroutine("ShowCombo");
+            StartCoroutine("ShowCombo");
+        }
+        //ln tic combo
+        //TODO: If frame rate is too low, combo adds too slowly.
+        else if(lnComboType == LnComboType.ruvit)
+        {
+            Debug.Log((float)(resolution / (16 * pulseConstant)));
+            length -= resolution / 16;
+
+            while (length > 0)
+            {
+                combo++;
+                StopCoroutine("ShowCombo");
+                StartCoroutine("ShowCombo");
+                length -= resolution / 16;
+                yield return new WaitForSeconds((float)(resolution / (16 * pulseConstant)));
+            }
+        }
+        yield return null;
+    }
+
+    IEnumerator ShowCombo()
+    {
         judge.SetActive(true);
         comboText.text = combo.ToString();
         for (int i = 102; i >= 0; i--)
@@ -458,7 +547,6 @@ public class GameController : MonoBehaviour {
             yield return new WaitForSeconds(0.03f);
             
         }
-
         judge.SetActive(false);
     }
     
@@ -471,8 +559,8 @@ public class GameController : MonoBehaviour {
         {
             string path = bms.path + "\\" + bh.name;
 
-
-            if (Path.GetExtension(path) == ".mpg")
+            string extension = Path.GetExtension(path);
+            if (extension == ".mpg" || extension == ".mpeg" || extension == ".avi")
             {
                 string fileName = path;
                 gstBga.m_URI = "file:///" + Uri.EscapeUriString((path).Replace("\\", "/"));
@@ -538,6 +626,6 @@ public class GameController : MonoBehaviour {
 
         soundObjects[sc.id].GetComponent<AudioSource>().clip = clip;
 
-        Debug.Log(clip.loadState);
+        string status = clip.loadState.ToString();
     }
 }

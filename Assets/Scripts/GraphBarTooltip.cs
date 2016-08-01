@@ -30,6 +30,11 @@ public class GraphBarTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
         scText = GameObject.Find("MeasureScratchText").GetComponent<Text>();
     }
 
+    void Start()
+    {
+        tooltipPanel.SetActive(false);
+    }
+
     public void OnPointerEnter(PointerEventData eventData)
     {
         prevColor = barImage.color;
@@ -39,6 +44,7 @@ public class GraphBarTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExit
         timeText.text = "Length: " + Math.Round(time, 2) + "s";
         densityText.text = "Density: " + Math.Round(density, 2) + "notes/s";
         scText.text = "Scratch: " + scratch;
+        lnText.text = "LN: " + ln;
         tooltipPanel.SetActive(true);
     }
 

@@ -363,7 +363,8 @@ namespace BMSParser
 
         private void SetSubtitle(BMSInfo bmsInfo)
         {
-            if (!string.IsNullOrEmpty(bmsInfo.subtitle))
+
+            if (!string.IsNullOrEmpty(bmsInfo.subtitle) || string.IsNullOrEmpty(bmsInfo.title))
                 return;
 
             char openBraket;

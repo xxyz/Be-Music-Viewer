@@ -8,7 +8,9 @@ public class DrawBMSGraph : MonoBehaviour {
     
     public GameObject graphBarWhite;
     public GameObject graphBarRed;
+    public GameObject graphBarBlue;
     public GameObject progressBar;
+    public GameObject tooltipBar;
 
     public int playingMeausure = 0;
 
@@ -50,7 +52,7 @@ public class DrawBMSGraph : MonoBehaviour {
         int currMeasure = 0;
         double currMeasureLength = 0;
         double currMeasureTime = 0;
-        int currMeasureNote = 0, currScratchNote = 0;
+        int currMeasureNote = 0, currScratchNote = 0, currLnNote = 0;
         int maxNote = 30;
 
         foreach (BmsEvent be in bmsEvents)
@@ -69,6 +71,7 @@ public class DrawBMSGraph : MonoBehaviour {
                 bar.transform.localScale = new Vector3(1.0f, 1.0f);
                 bars.Add(bar);
 
+                float scartchNoteBarHeight = 0f;
                 if(currScratchNote > 0)
                 {
                     GameObject scratchBar = Instantiate(graphBarRed) as GameObject;
@@ -76,19 +79,43 @@ public class DrawBMSGraph : MonoBehaviour {
                     scratchBar.transform.SetParent(transform);
                     RectTransform scratchRectTrans = scratchBar.GetComponent<RectTransform>();
                     scratchRectTrans.localPosition = new Vector3((float)(paddingLeft + width * currMeasureTime / endTime), paddingBottom);
-                    scratchRectTrans.sizeDelta = new Vector2((float)(currMeasureLength / endTime * width) - 0, (float)currScratchNote / (float)currMeasureLength / maxNote * height);
+
+                    scartchNoteBarHeight = currScratchNote / (float)currMeasureLength / maxNote * height;
+                    scratchRectTrans.sizeDelta = new Vector2((float)(currMeasureLength / endTime * width), scartchNoteBarHeight);
                     scratchBar.transform.localScale = new Vector3(1.0f, 1.0f);
+                }
+                if(currLnNote > 0)
+                {
+                    GameObject lnBar = Instantiate(graphBarBlue) as GameObject;
+                    lnBar.name = "LN Measure: " + currMeasure;
+                    lnBar.transform.SetParent(transform);
+                    RectTransform lnRectTrans = lnBar.GetComponent<RectTransform>();
+                    lnRectTrans.localPosition = new Vector3((float)(paddingLeft + width * currMeasureTime / endTime), paddingBottom + scartchNoteBarHeight);
+
+                    lnRectTrans.sizeDelta = new Vector2((float)(currMeasureLength / endTime * width), currLnNote / (float)currMeasureLength / maxNote * height);
+                    lnBar.transform.localScale = new Vector3(1.0f, 1.0f);
                 }
 
                 //set tooltip
-                GraphBarTooltip tooltip = bar.GetComponent<GraphBarTooltip>();
+
+                GameObject tooltipbar = Instantiate(tooltipBar) as GameObject;
+                tooltipbar.name = "Tooltip Measure:" + currMeasure;
+                tooltipbar.transform.SetParent(transform);
+                RectTransform tooltipbarRectTrans = tooltipbar.GetComponent<RectTransform>();
+                tooltipbarRectTrans.localPosition = new Vector3((float)(paddingLeft + width * currMeasureTime / endTime), paddingBottom);
+                tooltipbarRectTrans.sizeDelta = new Vector2((float)(currMeasureLength / endTime * width), height);
+                tooltipbar.transform.localScale = new Vector3(1.0f, 1.0f);
+                
+
+                GraphBarTooltip tooltip = tooltipbar.GetComponent<GraphBarTooltip>();
                 tooltip.measureNum = currMeasure;
                 tooltip.notes = currMeasureNote;
                 tooltip.time = currMeasureLength;
                 tooltip.density = currMeasureNote / currMeasureLength;
                 tooltip.scratch = currScratchNote;
+                tooltip.ln = currLnNote;
 
-                currMeasureNote = 0; currScratchNote = 0;
+                currMeasureNote = 0; currScratchNote = 0; currLnNote = 0;
                 currMeasure++;
                 currMeasureTime = be.time;
 
@@ -101,7 +128,8 @@ public class DrawBMSGraph : MonoBehaviour {
                     currMeasureNote++;
                     if (x == 8 || x == 16)
                         currScratchNote++;
-
+                    else if (((NoteEvent)be).l > 0)
+                        currLnNote++;
                 }
                     
             }
@@ -110,12 +138,13 @@ public class DrawBMSGraph : MonoBehaviour {
         isLoaded = true;
     }
 
+    //move progress bar
     void Update()
     {
         while (!isLoaded)
             return;
 
-        float xPos = Mathf.Clamp(paddingLeft + (Time.time + timeOffset) / (float)endTime * width, paddingLeft, width + paddingLeft);
+        float xPos = Mathf.Clamp(paddingLeft + (Time.time - timeOffset) / (float)endTime * width, paddingLeft, width + paddingLeft);
         progressBarRect.localPosition = new Vector3(xPos, paddingBottom);
         if(progressMeasure < bars.Count && bars[progressMeasure] != null && 
             bars[progressMeasure].GetComponent<RectTransform>().localPosition.x <= progressBarRect.localPosition.x)
